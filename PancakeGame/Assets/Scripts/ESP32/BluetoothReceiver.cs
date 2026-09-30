@@ -5,30 +5,43 @@ using System.IO.Ports;
 using System.Runtime.InteropServices;
 using System.Threading;
 using UnityEngine;
+using Unity.VisualScripting;
 
 public class BluetoothReceiver : MonoBehaviour
 {
     private SerialPort bluetooth;
     private ConcurrentQueue<RelayPacket> receiveQueue = new();
+    private ConcurrentQueue<string> errorQueue = new(); // エラー文字列保持用
 
     private Thread receiveThread;
     private bool running;
 
     private ESP32ControllerParser parser;
 
-    // パケットサイズ: Header (2bytes) + RelayPacket (28bytes) = 30bytes
-    private const int PACKET_SIZE = 30;
-    private const int PAYLOAD_SIZE = 28;
+    // ESP32の実際の送信用構造体に合わせたサイズ（ヘッダー2B + ペイロード26B = 28B）
+    private const int PACKET_SIZE = 28;
+    private const int PAYLOAD_SIZE = 26;
+
+    //入力データ数値の閾値の為のScriptableObject
+    [SerializeField]private ControllerSettings _controllerSettings;
 
     void Start()
     {
-        parser = new ESP32ControllerParser();
+        parser = new ESP32ControllerParser(_controllerSettings);
         
-        bluetooth = new SerialPort("COM5", 115200);
-        bluetooth.Open();
+        try
+        {
+            bluetooth = new SerialPort("COM5", 115200);
+            bluetooth.Open();
+            Debug.Log("COM5 ポートを正常に開きました");
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError($"ポートオープンエラー: {ex.Message}");
+            return;
+        }
 
         running = true;
-
         receiveThread = new Thread(ReceiveLoop);
         receiveThread.Start();
     }
@@ -50,7 +63,6 @@ public class BluetoothReceiver : MonoBehaviour
                         buffer.Add(tempBuffer[i]);
                     }
 
-                    // ヘッダー検索とパケット抽出
                     while (buffer.Count >= PACKET_SIZE)
                     {
                         if (buffer[0] == 0xAA && buffer[1] == 0xCC)
@@ -63,7 +75,6 @@ public class BluetoothReceiver : MonoBehaviour
                         }
                         else
                         {
-                            // ヘッダーが見つかるまで先頭を切り捨てる
                             buffer.RemoveAt(0);
                         }
                     }
@@ -75,7 +86,8 @@ public class BluetoothReceiver : MonoBehaviour
             }
             catch (Exception ex)
             {
-                Debug.LogError($"Bluetooth受信エラー: {ex.Message}");
+                // サブスレッドで直接ログを出さずキューに溜める
+                errorQueue.Enqueue($"Bluetooth受信エラー: {ex.Message}");
             }
         }
     }
@@ -95,6 +107,13 @@ public class BluetoothReceiver : MonoBehaviour
 
     void Update()
     {
+        // メインスレッドでエラーログを出力
+        while (errorQueue.TryDequeue(out string errorMsg))
+        {
+            Debug.LogError(errorMsg);
+        }
+
+        // 受信パケットの処理
         while (receiveQueue.TryDequeue(out RelayPacket packet))
         {
             ParseData(packet);
@@ -110,7 +129,7 @@ public class BluetoothReceiver : MonoBehaviour
     {
         running = false;
 
-        if (receiveThread != null)
+        if (receiveThread != null && receiveThread.IsAlive)
         {
             receiveThread.Join();
         }

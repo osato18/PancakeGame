@@ -462,6 +462,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7ee68caa02f9d0a4c86dcfbfbe19470f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BluetoothReceiver
+  _controllerSettings: {fileID: 11400000, guid: bd9099b5f25e4bc43954b4f5768f9818, type: 2}
 --- !u!114 &1243200237
 MonoBehaviour:
   m_ObjectHideFlags: 0
