@@ -109,6 +109,7 @@ public class system_playerDevice : MonoBehaviour
     {
         if (!pancake.flying)
         {
+            Debug.Log("GameJump");
             float f_Vel = pancake.topPos / pancake.jumpTime + GRAVITY * pancake.jumpTime / 2;
             pancake.rb.AddForce(new Vector3(0.0f, f_Vel, 0.0f), ForceMode.VelocityChange);
             skillet.pancake.flying = true;

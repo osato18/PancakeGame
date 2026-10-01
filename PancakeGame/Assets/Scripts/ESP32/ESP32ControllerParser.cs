@@ -24,7 +24,7 @@ public class ESP32ControllerParser
         }
 
         // 受信確認用のログを追加
-        Debug.Log($"[Received] Accel: {packet.imuAccel}, Button: {packet.buttonState}, ToF: {packet.tofSensor}");
+        //Debug.Log($"[Received] Accel: {packet.imuAccel}, Button: {packet.buttonState}, ToF: {packet.tofSensor}");
 
         InputInRange(packet);
 
@@ -46,14 +46,26 @@ public class ESP32ControllerParser
     }
 
     private void InputInRange(RelayPacket packet)
-{
-    // 閾値を超えている間は 255 (Pressed: 1.0)、下回っている間は 0 (Released: 0.0) にする
-    bool isOver = packet.imuAccel.z >= _conSetting.jumpRangeMin;
+    {
+        // 閾値を超えている間は 255 (Pressed: 1.0)、下回っている間は 0 (Released: 0.0) にする
+        bool isOver;
+        if (packet.imuAccel.z >= 0 && Mathf.Abs(packet.imuAccel.z) >= _conSetting.jumpRangeMin)
+        {
+            isOver = true;
+        }
+        else
+        {
+            isOver = false;
+        }
 
-    isJump = isOver ? (byte)255 : (byte)0;
-    isButtonA = isOver ? (byte)255 : (byte)0;
+        isJump = isOver ? (byte)255 : (byte)0;
+        isButtonA = isOver ? (byte)255 : (byte)0;
 
-    // Debug.Log("isJump:" + isJump);
-    // Debug.Log("isButtonA:" + isButtonA);
-}
+        if (isButtonA==255)
+        {
+            Debug.Log("ControllerJump");
+        }
+        // Debug.Log("isJump:" + isJump);
+        // Debug.Log("isButtonA:" + isButtonA);
+    }
 }
