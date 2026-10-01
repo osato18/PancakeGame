@@ -64,7 +64,7 @@
                     "name": "Previous",
                     "type": "Button",
                     "id": "2776c80d-3c14-4091-8c56-d04ced07a2b0",
-                    "expectedControlType": "Button",
+                    "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
@@ -404,6 +404,17 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "XR",
+                    "action": "Jump",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "1f96b182-f673-44b9-b301-81090e08d984",
+                    "path": "<ESP32Controller>/buttonA",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";ESP32Controller",
                     "action": "Jump",
                     "isComposite": false,
                     "isPartOfComposite": false
@@ -1049,6 +1060,17 @@
             "devices": [
                 {
                     "devicePath": "<XRController>",
+                    "isOptional": false,
+                    "isOR": false
+                }
+            ]
+        },
+        {
+            "name": "ESP32Controller",
+            "bindingGroup": "ESP32Controller",
+            "devices": [
+                {
+                    "devicePath": "<ESP32Controller>",
                     "isOptional": false,
                     "isOR": false
                 }
