@@ -12,5 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c32c24f25052b3046b01459546245835, type: 3}
   m_Name: ESP32ControllerSettings
   m_EditorClassIdentifier: Assembly-CSharp::ControllerSettings
-  jumpRangeMin: 1.5
+  jumpRangeMin: 1.2
   jumpRangeMax: 5

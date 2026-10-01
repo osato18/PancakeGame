@@ -24,7 +24,7 @@ public class ESP32ControllerParser
         }
 
         // 受信確認用のログを追加
-        //Debug.Log($"[Received] Accel: {packet.imuAccel}, Button: {packet.buttonState}, ToF: {packet.tofSensor}");
+        Debug.Log($"[Received] Accel: {packet.imuAccel}, Button: {packet.buttonState}, ToF: {packet.tofSensor}");
 
         InputInRange(packet);
 
