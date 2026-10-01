@@ -6,10 +6,15 @@ public class ESP32ControllerParser
     private ControllerSettings _conSetting;
     private byte isJump;
     private byte isButtonA;
+
+    // 前回閾値を超えていたかを保持するフラグ
+    private bool _wasOverJumpRange = false;
+
     public ESP32ControllerParser(ControllerSettings controllerSettings)
     {
-        _conSetting=controllerSettings;
+        _conSetting = controllerSettings;
     }
+
     public void Parse(RelayPacket packet)
     {
         if (ESP32Controller.current == null)
@@ -20,22 +25,20 @@ public class ESP32ControllerParser
 
         // 受信確認用のログを追加
         Debug.Log($"[Received] Accel: {packet.imuAccel}, Button: {packet.buttonState}, ToF: {packet.tofSensor}");
-        
+
         InputInRange(packet);
 
         // 受信データ（RelayPacket）を Input System 用の State 構造体に詰め替える
         ESP32ControllerState state = new ESP32ControllerState
         {
-            //shakeFlag = (byte)(packet.shakeFlag ? 1 : 0),
-            shakeFlag=isJump,
+            shakeFlag = isJump,
             imuAccel = packet.imuAccel,
             imuGyro = packet.imuGyro,
-            //buttonA = (byte)(packet.buttonState ? 1 : 0),
-            buttonA=isButtonA,
+            buttonA = isButtonA,
             tofSensor = packet.tofSensor
         };
-        
-        //QueueStateEvent を使って Input System にデータを登録・更新する
+
+        // QueueStateEvent を使って Input System にデータを登録・更新する
         InputSystem.QueueStateEvent(
             ESP32Controller.current,
             state
@@ -43,16 +46,14 @@ public class ESP32ControllerParser
     }
 
     private void InputInRange(RelayPacket packet)
-    {
-        if (packet.imuAccel.z < _conSetting.jumpRangeMin)
-        {
-            isJump=(byte)0;
-            isButtonA=(byte)0;
-        }
-        else
-        {
-            isJump=(byte)1;
-            isButtonA=(byte)1;
-        }
-    }
+{
+    // 閾値を超えている間は 255 (Pressed: 1.0)、下回っている間は 0 (Released: 0.0) にする
+    bool isOver = packet.imuAccel.z >= _conSetting.jumpRangeMin;
+
+    isJump = isOver ? (byte)255 : (byte)0;
+    isButtonA = isOver ? (byte)255 : (byte)0;
+
+    // Debug.Log("isJump:" + isJump);
+    // Debug.Log("isButtonA:" + isButtonA);
+}
 }

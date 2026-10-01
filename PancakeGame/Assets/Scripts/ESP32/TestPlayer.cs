@@ -3,8 +3,11 @@ using UnityEngine.InputSystem;
 
 public class TestPlayer : MonoBehaviour
 {
-    private void OnJump()
+    private void OnJump(InputValue value)
     {
-        Debug.Log("ジャンプ！");
+        if (value.isPressed)
+        {
+            Debug.Log("OnJump!");
+        }    
     }
 }

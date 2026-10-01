@@ -47,7 +47,8 @@ public struct ESP32ControllerState : IInputStateTypeInfo
 {
     public FourCC format => new FourCC('E', 'S', 'P', '3');
 
-    [InputControl(name = "shakeFlag", layout = "Button")]
+    // format = "BYTE" を追加
+    [InputControl(name = "shakeFlag", layout = "Button", format = "BYTE")]
     public byte shakeFlag;
 
     [InputControl(name = "imuAccel", layout = "Vector3")]
@@ -56,7 +57,8 @@ public struct ESP32ControllerState : IInputStateTypeInfo
     [InputControl(name = "imuGyro", layout = "Vector3")]
     public Vector3 imuGyro;
 
-    [InputControl(name = "buttonA", layout = "Button")]
+    // format = "BYTE" を追加
+    [InputControl(name = "buttonA", layout = "Button", format = "BYTE")]
     public byte buttonA;
 
     [InputControl(name = "tofSensor", layout = "Integer")]

@@ -414,7 +414,7 @@
                     "path": "<ESP32Controller>/buttonA",
                     "interactions": "",
                     "processors": "",
-                    "groups": "",
+                    "groups": ";ESP32Controller",
                     "action": "Jump",
                     "isComposite": false,
                     "isPartOfComposite": false
@@ -1060,6 +1060,17 @@
             "devices": [
                 {
                     "devicePath": "<XRController>",
+                    "isOptional": false,
+                    "isOR": false
+                }
+            ]
+        },
+        {
+            "name": "ESP32Controller",
+            "bindingGroup": "ESP32Controller",
+            "devices": [
+                {
+                    "devicePath": "<ESP32Controller>",
                     "isOptional": false,
                     "isOR": false
                 }

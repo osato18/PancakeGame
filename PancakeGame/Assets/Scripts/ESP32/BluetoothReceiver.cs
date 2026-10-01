@@ -12,7 +12,6 @@ public class BluetoothReceiver : MonoBehaviour
     private SerialPort bluetooth;
     private ConcurrentQueue<RelayPacket> receiveQueue = new();
     private ConcurrentQueue<string> errorQueue = new(); // エラー文字列保持用
-
     private Thread receiveThread;
     private bool running;
 
