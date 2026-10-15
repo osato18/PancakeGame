@@ -1,3 +1,6 @@
+using System.Collections.Generic;
+using System.IO;
+using System.Text;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -9,6 +12,17 @@ public class ESP32ControllerParser
 
     // 前回閾値を超えていたかを保持するフラグ
     private bool _wasOverJumpRange = false;
+
+    // --- CSV出力用のデータ構造とリスト ---
+    public struct SensorLogData
+    {
+        public float timestamp;       // 経過時間 (秒)
+        public Vector3 accel;         // 加速度
+        public Vector3 gyro;          // 角速度
+        public bool isJumpTriggered;  // ジャンプ判定が有効か (1 or 0)
+    }
+
+    private List<SensorLogData> _sensorLogs = new List<SensorLogData>();
 
     public ESP32ControllerParser(ControllerSettings controllerSettings)
     {
@@ -23,10 +37,16 @@ public class ESP32ControllerParser
             return;
         }
 
-        // 受信確認用のログを追加
-        Debug.Log($"[Received] Accel: {packet.imuAccel}, Button: {packet.buttonState}, ToF: {packet.tofSensor}");
-
         InputInRange(packet);
+
+        // --- 受信したデータとジャンプ判定を時刻（Time.time）とともに記録 ---
+        _sensorLogs.Add(new SensorLogData
+        {
+            timestamp = Time.time,
+            accel = packet.imuAccel,
+            gyro = packet.imuGyro,
+            isJumpTriggered = (isJump == 255)
+        });
 
         // 受信データ（RelayPacket）を Input System 用の State 構造体に詰め替える
         ESP32ControllerState state = new ESP32ControllerState
@@ -61,11 +81,31 @@ public class ESP32ControllerParser
         isJump = isOver ? (byte)255 : (byte)0;
         isButtonA = isOver ? (byte)255 : (byte)0;
 
-        if (isButtonA==255)
+        if (isButtonA == 255)
         {
-            Debug.Log("ControllerJump");
+            // Debug.Log("ControllerJump");
         }
-        // Debug.Log("isJump:" + isJump);
-        // Debug.Log("isButtonA:" + isButtonA);
+    }
+
+    // --- CSVファイル出力メソッド ---
+    public void ExportToCSV(string filePath)
+    {
+        StringBuilder sb = new StringBuilder();
+        
+        // CSVのヘッダー行
+        sb.AppendLine("Timestamp,Accel_X,Accel_Y,Accel_Z,Gyro_X,Gyro_Y,Gyro_Z,IsJump");
+
+        foreach (var log in _sensorLogs)
+        {
+            // 小数点以下4桁でフォーマット
+            string line = $"{log.timestamp:F4}," +
+                          $"{log.accel.x:F4},{log.accel.y:F4},{log.accel.z:F4}," +
+                          $"{log.gyro.x:F4},{log.gyro.y:F4},{log.gyro.z:F4}," +
+                          $"{(log.isJumpTriggered ? 1 : 0)}";
+            sb.AppendLine(line);
+        }
+
+        File.WriteAllText(filePath, sb.ToString(), Encoding.UTF8);
+        Debug.Log($"<color=cyan>センサーログをCSVに出力しました: {filePath}</color>");
     }
 }
