@@ -10,13 +10,20 @@ public class system_playerDevice : MonoBehaviour
     [SerializeField] private GameObject pancakeObj;
     private Skillet skillet;
 
+    [SerializeField] private system_scores scoreSystem;
+
     [SerializeField] private InputAction skilletAction;
     [SerializeField] private InputAction pancakeAction;
 
+    [SerializeField] private float s_moveSpeed;
     [SerializeField] private float p_jumpTime;
     [SerializeField] private float p_topPos;
+    [SerializeField] private float p_bakingSpeed;
+    [SerializeField] private float p_overbakingScore;
 
     private float GRAVITY = 3.141592f;
+
+    private float moveTime = 0.0f;
 
     void Awake()
     {
@@ -70,7 +77,8 @@ public class system_playerDevice : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-
+        SkilletMove(ref skillet);
+        BakingScoring(ref skillet.pancake);
     }
 
     void SkilletInit(ref Skillet skillet, Rigidbody pancakeBody)
@@ -81,54 +89,123 @@ public class system_playerDevice : MonoBehaviour
         skillet.pancake.col = skillet.pancake.obj.GetComponent<Collider>();
         skillet.pancake.rb = pancakeBody;
 
-        skillet.stoveNum = 1;
+        skillet.MoveSpeed = s_moveSpeed;
+
+        skillet.stoveNowNum = 1;
+        skillet.stoveNextNum = 1;
+
+        skillet.obj.transform.position = skillet.linesObj[skillet.stoveNowNum].transform.position;
 
         skillet.pancake.flying = false;
         skillet.pancake.bakingScore = new float[2];
         skillet.pancake.jumpTime = p_jumpTime;
         skillet.pancake.topPos = p_topPos;
         skillet.pancake.surfase = 0;
+        skillet.pancake.bakingSpeed = p_bakingSpeed;
+        skillet.pancake.overBake = new bool[2];
+        skillet.pancake.overBake[0] = false;
+        skillet.pancake.overBake[1] = false;
     }
-
-    void SkilletMove(Skillet skillet, Vector2 moveVec)
+    void SkilletControl(ref Skillet skillet, Vector2 moveVec)
     {
         if (!skillet.pancake.flying)
         {
-            if (moveVec.x > 0 && skillet.stoveNum < 2)
+            if (moveVec.x > 0)
             {
-                skillet.stoveNum++;
+                skillet.stoveNextNum = 2;
+                Debug.Log("SkilletControl: Move Right" + skillet.stoveNowNum + skillet.stoveNextNum);
             }
-            else if (moveVec.x > 0 && skillet.stoveNum > 0)
+            else if (moveVec.x < 0)
             {
-                skillet.stoveNum--;
+                skillet.stoveNextNum = 0;
+                Debug.Log("SkilletControl: Move Left" + skillet.stoveNowNum + skillet.stoveNextNum);
+            }
+            else if (moveVec.x == 0)
+            {
+                skillet.stoveNextNum = 1;
+                Debug.Log("SkilletControl: Move center" + skillet.stoveNowNum + skillet.stoveNextNum);
             }
         }
     }
 
-    void PancakeMove(Pancake pancake)
+    void SkilletMove(ref Skillet skillet)
     {
-        if (!pancake.flying)
+        if(!(skillet.stoveNowNum == skillet.stoveNextNum))
+        {
+
+
+            moveTime += Time.deltaTime * skillet.MoveSpeed;
+            Debug.Log($"SkilletMove: MoveTime {moveTime}, NowNum {skillet.stoveNowNum}, NextNum {skillet.stoveNextNum}");
+            skillet.obj.transform.position = Vector3.Lerp(skillet.linesObj[skillet.stoveNowNum].transform.position, skillet.linesObj[skillet.stoveNextNum].transform.position, moveTime);
+
+
+            if(moveTime >= 1.0f)
+            {
+                skillet.stoveNowNum = skillet.stoveNextNum;
+                moveTime = 0.0f;
+            }
+        }
+    }
+
+    void PancakeMove(ref Pancake pancake)
+    {
+        if (!pancake.flying && (skillet.stoveNowNum == skillet.stoveNextNum))
         {
             Debug.Log("GameJump");
             float f_Vel = pancake.topPos / pancake.jumpTime + GRAVITY * pancake.jumpTime / 2;
             pancake.rb.AddForce(new Vector3(0.0f, f_Vel, 0.0f), ForceMode.VelocityChange);
+
+            if(pancake.surfase == 0)
+            {
+                ResetBakingScore(ref pancake);
+                pancake.surfase = 1;
+            }
+            else if(pancake.surfase == 1)
+            {
+                ResetBakingScore(ref pancake);
+                pancake.surfase = 0;
+            }
+
             skillet.pancake.flying = true;
         }
+    }
+
+
+    void OverBakingCheck(ref Pancake pancake)
+    {
+        if (pancake.bakingScore[pancake.surfase] >= p_overbakingScore)
+        {
+            pancake.overBake[pancake.surfase] = true;
+        }
+    }
+
+    void BakingScoring(ref Pancake pancake)
+    {
+        pancake.bakingScore[pancake.surfase] += pancake.bakingSpeed * Time.deltaTime;
+        if (!pancake.flying)
+        {
+            scoreSystem.SetFireScore(pancake.bakingScore[pancake.surfase]);
+        }
+        OverBakingCheck(ref pancake);
+    }
+
+    void ResetBakingScore(ref Pancake pancake)
+    {
+        pancake.bakingScore[pancake.surfase] = 0.0f;
     }
 
     void OnMove(InputAction.CallbackContext ctx)
     {
         Vector2 move = ctx.ReadValue<Vector2>();
-        SkilletMove(skillet, move);
+        SkilletControl(ref skillet, move);
     }
     void OnMoveCanceled(InputAction.CallbackContext ctx)
     {
-
     }
 
     void OnJump(InputAction.CallbackContext ctx)
     {
-        PancakeMove(skillet.pancake);
+        PancakeMove(ref skillet.pancake);
     }
 
     void OnCollisionEnter(Collision collision)
@@ -141,7 +218,9 @@ public struct Skillet
 {
     public GameObject obj;
     public GameObject[] linesObj;
-    public int stoveNum;
+    public int stoveNowNum;
+    public int stoveNextNum;
+    public float MoveSpeed;
 
     public Pancake pancake;
 }
@@ -151,6 +230,8 @@ public struct Pancake
     public GameObject obj;
     public Rigidbody rb;
     public float[] bakingScore;
+    public float bakingSpeed;
+    public bool[] overBake;
     public float jumpTime;
     public float topPos;
     public bool flying;

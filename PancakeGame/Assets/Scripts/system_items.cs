@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class system_items : MonoBehaviour
 {
+    public system_scores scoresSystem;
     [SerializeField] private ItemsType itemType;
     public Collider p_col;
     private Items item;
@@ -25,16 +26,29 @@ public class system_items : MonoBehaviour
         
     }
 
+    void Scoring(ref Items items)
+    {
+        if (items.type.Equals(ItemsType.good))
+        {
+            scoresSystem.AddScore(100);
+        }
+        else if (items.type.Equals(ItemsType.bad))
+        {
+            scoresSystem.AddScore(-100);
+        }
+    } 
+
     void OnTriggerEnter(Collider other)
     {
         if (other.Equals(p_col))
         {
+            Scoring(ref item);
             Destroy(gameObject);
         }
     }
     IEnumerator Destroy()
     {
-        yield return new WaitForSeconds(10f);
+        yield return new WaitForSeconds(5f);
         Destroy(gameObject);
     }
 }
