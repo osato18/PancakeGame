@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Runtime.CompilerServices;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -19,7 +20,9 @@ public class system_playerDevice : MonoBehaviour
     [SerializeField] private float p_jumpTime;
     [SerializeField] private float p_topPos;
     [SerializeField] private float p_bakingSpeed;
+    [SerializeField] private float p_bakingAddScore;
     [SerializeField] private float p_overbakingScore;
+    [SerializeField] private float p_bakingResetScore;
 
     private float GRAVITY = 3.141592f;
 
@@ -79,6 +82,7 @@ public class system_playerDevice : MonoBehaviour
     {
         SkilletMove(ref skillet);
         BakingScoring(ref skillet.pancake);
+        OverBakeDemerit();
     }
 
     void SkilletInit(ref Skillet skillet, Rigidbody pancakeBody)
@@ -100,7 +104,7 @@ public class system_playerDevice : MonoBehaviour
         skillet.pancake.bakingScore = new float[2];
         skillet.pancake.jumpTime = p_jumpTime;
         skillet.pancake.topPos = p_topPos;
-        skillet.pancake.surfase = 0;
+        skillet.pancake.surface = 0;
         skillet.pancake.bakingSpeed = p_bakingSpeed;
         skillet.pancake.overBake = new bool[2];
         skillet.pancake.overBake[0] = false;
@@ -155,43 +159,78 @@ public class system_playerDevice : MonoBehaviour
             float f_Vel = pancake.topPos / pancake.jumpTime + GRAVITY * pancake.jumpTime / 2;
             pancake.rb.AddForce(new Vector3(0.0f, f_Vel, 0.0f), ForceMode.VelocityChange);
 
-            if(pancake.surfase == 0)
+            if(pancake.surface == 0)
             {
                 ResetBakingScore(ref pancake);
-                pancake.surfase = 1;
+                pancake.surface = 1;
             }
-            else if(pancake.surfase == 1)
+            else if(pancake.surface == 1)
             {
                 ResetBakingScore(ref pancake);
-                pancake.surfase = 0;
+                pancake.surface = 0;
             }
 
             skillet.pancake.flying = true;
         }
     }
 
+    float spanTime = 0f;
+    void OverBakeDemerit()
+    {
+        
+        if (skillet.pancake.overBake[skillet.pancake.surface])
+        {
+            spanTime += Time.deltaTime;
+            if(spanTime >= 5f)
+            {
+                scoreSystem.AddScore(-50);
+                spanTime = 0f;
+            }
+        }
+        else if(spanTime > 0.001)
+        {
+            spanTime = 0;
+        }
+        
+    }
+
 
     void OverBakingCheck(ref Pancake pancake)
     {
-        if (pancake.bakingScore[pancake.surfase] >= p_overbakingScore)
+        if (pancake.bakingScore[pancake.surface] >= p_overbakingScore)
         {
-            pancake.overBake[pancake.surfase] = true;
+            pancake.overBake[pancake.surface] = true;
         }
     }
 
+    float bakeSpanTime = 0f;
     void BakingScoring(ref Pancake pancake)
     {
-        pancake.bakingScore[pancake.surfase] += pancake.bakingSpeed * Time.deltaTime;
+        pancake.bakingScore[pancake.surface] += pancake.bakingSpeed * Time.deltaTime;
+        if (pancake.overBake[pancake.surface])
+        {
+            pancake.bakingScore[pancake.surface] = 0f;
+        }
         if (!pancake.flying)
         {
-            scoreSystem.SetFireScore(pancake.bakingScore[pancake.surfase]);
+            scoreSystem.SetFireScore(pancake.bakingScore[pancake.surface]);
+            bakeSpanTime += Time.deltaTime;
+            if(bakeSpanTime >= 1)
+            {
+                scoreSystem.AddScore((int)(pancake.bakingScore[pancake.surface] * p_bakingAddScore));
+                bakeSpanTime = 0f;
+            }
         }
         OverBakingCheck(ref pancake);
     }
 
     void ResetBakingScore(ref Pancake pancake)
     {
-        pancake.bakingScore[pancake.surfase] = 0.0f;
+        pancake.bakingScore[pancake.surface] -= p_bakingResetScore;
+        if(pancake.bakingScore[pancake.surface] < 0f)
+        {
+            pancake.bakingScore[pancake.surface] = 0f;
+        }
     }
 
     void OnMove(InputAction.CallbackContext ctx)
@@ -235,6 +274,6 @@ public struct Pancake
     public float jumpTime;
     public float topPos;
     public bool flying;
-    public int surfase;
+    public int surface;
     public Collider col;
 }
