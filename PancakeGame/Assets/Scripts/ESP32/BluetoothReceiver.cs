@@ -137,5 +137,13 @@ public class BluetoothReceiver : MonoBehaviour
         {
             bluetooth.Close();
         }
+
+        // --- アプリ終了時にCSVを出力する処理を追加 ---
+        if (parser != null)
+        {
+            string fileName = $"ESP32_SensorLog_{System.DateTime.Now:yyyyMMdd_HHmmss}.csv";
+            string filePath = System.IO.Path.Combine(Application.persistentDataPath, fileName);
+            parser.ExportToCSV(filePath);
+        }
     }
 }
