@@ -101,7 +101,7 @@ public class system_playerDevice : MonoBehaviour
         skillet.obj.transform.position = skillet.linesObj[skillet.stoveNowNum].transform.position;
 
         skillet.pancake.flying = false;
-        skillet.pancake.bakingScore = new float[2];
+        skillet.pancake.bakingScore = 0f;
         skillet.pancake.jumpTime = p_jumpTime;
         skillet.pancake.topPos = p_topPos;
         skillet.pancake.surface = 0;
@@ -197,28 +197,28 @@ public class system_playerDevice : MonoBehaviour
 
     void OverBakingCheck(ref Pancake pancake)
     {
-        if (pancake.bakingScore[pancake.surface] >= p_overbakingScore)
+        if (pancake.bakingScore >= p_overbakingScore)
         {
             pancake.overBake[pancake.surface] = true;
         }
     }
 
-    float bakeSpanTime = 0f;
+    float bakingTimer = 0f;
     void BakingScoring(ref Pancake pancake)
     {
-        pancake.bakingScore[pancake.surface] += pancake.bakingSpeed * Time.deltaTime;
+        pancake.bakingScore += pancake.bakingSpeed * Time.deltaTime;
         if (pancake.overBake[pancake.surface])
         {
-            pancake.bakingScore[pancake.surface] = 0f;
+            pancake.bakingScore = 0f;
         }
         if (!pancake.flying)
         {
-            scoreSystem.SetFireScore(pancake.bakingScore[pancake.surface]);
-            bakeSpanTime += Time.deltaTime;
-            if(bakeSpanTime >= 1)
+            scoreSystem.SetFireScore(pancake.bakingScore);
+            bakingTimer += Time.deltaTime;
+            if(bakingTimer >= 1)
             {
-                scoreSystem.AddScore((int)(pancake.bakingScore[pancake.surface] * p_bakingAddScore));
-                bakeSpanTime = 0f;
+                scoreSystem.AddScore((int)(pancake.bakingScore * p_bakingAddScore));
+                bakingTimer = 0f;
             }
         }
         OverBakingCheck(ref pancake);
@@ -226,10 +226,10 @@ public class system_playerDevice : MonoBehaviour
 
     void ResetBakingScore(ref Pancake pancake)
     {
-        pancake.bakingScore[pancake.surface] -= p_bakingResetScore;
-        if(pancake.bakingScore[pancake.surface] < 0f)
+        pancake.bakingScore -= p_bakingResetScore;
+        if(pancake.bakingScore < 0f)
         {
-            pancake.bakingScore[pancake.surface] = 0f;
+            pancake.bakingScore = 0f;
         }
     }
 
@@ -268,7 +268,7 @@ public struct Pancake
 {
     public GameObject obj;
     public Rigidbody rb;
-    public float[] bakingScore;
+    public float bakingScore;
     public float bakingSpeed;
     public bool[] overBake;
     public float jumpTime;

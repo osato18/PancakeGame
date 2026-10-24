@@ -15,7 +15,7 @@ public class system_itemsSpawner : MonoBehaviour
     [SerializeField] private float minSpanTime = 3f;
     [SerializeField] private float rangeTime = 5f;
 
-    public List<GameObject> itemsObjs = new List<GameObject>();
+    public List<system_items> itemsSystem = new List<system_items>();
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -54,14 +54,22 @@ public class system_itemsSpawner : MonoBehaviour
         system_Items.p_col = p_col;
         system_Items.scoresSystem = scoresSystem;
         int i = 0;
-        foreach (GameObject item in itemsObjs)
+        foreach (system_items item in itemsSystem)
         {
             if (item.Equals(null))
             {
-                itemsObjs.Insert(i, spawnObj);
+                itemsSystem.Insert(i, system_Items);
                 break;
             }
             i++;
+        }
+    }
+
+    public void lineItemSpeedChange(float coe)
+    {
+        foreach (system_items i_sys in itemsSystem)
+        {
+            i_sys.speedChange(coe);
         }
     }
 }
