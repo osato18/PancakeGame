@@ -8,8 +8,12 @@ public class system_scores : MonoBehaviour
     [SerializeField] private TextMeshProUGUI scoreTxt;
     [SerializeField] private TextMeshProUGUI fireScoreTxt;
     [SerializeField] private Slider bakingSlider;
+    [SerializeField] private TextMeshProUGUI timerText;
     private int score = 0;
     private float bakingScore = 0.0f;
+
+    public float timer = 0.0f;
+
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -20,7 +24,7 @@ public class system_scores : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        Timer();
     }
 
     public void SetScore(int setScore)
@@ -47,5 +51,11 @@ public class system_scores : MonoBehaviour
         bakingScore += addFireScore;
         fireScoreTxt.text = "Baking Score: " + bakingScore.ToString("F2");
         bakingSlider.value = bakingScore;
+    }
+
+    void Timer()
+    {
+        timer += Time.deltaTime;
+        timerText.text = "Time: " + timer.ToString("F1");
     }
 }
