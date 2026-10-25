@@ -1264,6 +1264,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 64bc5478e8d2b5c4f82644d440aba4a4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TestPlayer
+--- !u!1 &1574376650
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1574376652}
+  - component: {fileID: 1574376651}
+  m_Layer: 0
+  m_Name: EffectManager
 --- !u!1 &1526446159
 GameObject:
   m_ObjectHideFlags: 0
@@ -1314,6 +1326,35 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!114 &1574376651
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1574376650}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cf1bdadb07ae5524396689faa9cc0705, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EffectManager
+  effectPrefabs:
+  - {fileID: 1981674816437492326, guid: 3f54e9a858bdc514293ebd1f7ed6a6bf, type: 3}
+--- !u!4 &1574376652
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1574376650}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 1, y: 0.6511, z: 1}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &1790461737
 Transform:
   m_ObjectHideFlags: 0
@@ -1862,6 +1903,7 @@ SceneRoots:
   - {fileID: 1475668238}
   - {fileID: 1243200238}
   - {fileID: 705609445}
+  - {fileID: 1574376652}
   - {fileID: 778004650}
   - {fileID: 1942063647}
   - {fileID: 577842283}
