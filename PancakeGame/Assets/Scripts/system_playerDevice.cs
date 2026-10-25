@@ -9,6 +9,8 @@ public class system_playerDevice : MonoBehaviour
     [SerializeField] private GameObject[] linesObj;
     [SerializeField] private GameObject skilletObj;
     [SerializeField] private GameObject pancakeObj;
+    [SerializeField] private GameObject[] visualObjs = new GameObject[5];
+    [SerializeField] private GameObject[] pancakePrefab;
     private Skillet skillet;
 
     [SerializeField] private system_scores scoreSystem;
@@ -27,6 +29,8 @@ public class system_playerDevice : MonoBehaviour
     private float GRAVITY = 3.141592f;
 
     private float moveTime = 0.0f;
+
+    private float[] bakingCoe = {1.0f, 1.0f, 1.0f};
 
     void Awake()
     {
@@ -81,7 +85,7 @@ public class system_playerDevice : MonoBehaviour
     void Update()
     {
         SkilletMove(ref skillet);
-        BakingScoring(ref skillet.pancake);
+        BakingScoring(ref skillet, ref skillet.pancake);
         OverBakeDemerit();
     }
 
@@ -99,6 +103,15 @@ public class system_playerDevice : MonoBehaviour
         skillet.stoveNextNum = 1;
 
         skillet.obj.transform.position = skillet.linesObj[skillet.stoveNowNum].transform.position;
+
+        //skillet.pancake.visualObjs = new GameObject[5];
+        //skillet.pancake.visualObjs = visualObjs;
+
+        //skillet.pancake.visualObjs[0].SetActive(true);
+        // for(int i = 1; i < 5; i++)
+        // {
+        //     skillet.pancake.visualObjs[0].SetActive(false);
+        // }
 
         skillet.pancake.flying = false;
         skillet.pancake.bakingScore = 0f;
@@ -204,9 +217,9 @@ public class system_playerDevice : MonoBehaviour
     }
 
     float bakingTimer = 0f;
-    void BakingScoring(ref Pancake pancake)
+    void BakingScoring(ref Skillet skillet, ref Pancake pancake)
     {
-        pancake.bakingScore += pancake.bakingSpeed * Time.deltaTime;
+        pancake.bakingScore += bakingCoe[skillet.stoveNowNum] * pancake.bakingSpeed * Time.deltaTime;
         if (pancake.overBake[pancake.surface])
         {
             pancake.bakingScore = 0f;
@@ -214,7 +227,7 @@ public class system_playerDevice : MonoBehaviour
         if (!pancake.flying)
         {
             scoreSystem.SetFireScore(pancake.bakingScore);
-            bakingTimer += Time.deltaTime;
+            bakingTimer += Time.deltaTime * bakingCoe[skillet.stoveNowNum];
             if(bakingTimer >= 1)
             {
                 scoreSystem.AddScore((int)(pancake.bakingScore * p_bakingAddScore));
@@ -231,6 +244,11 @@ public class system_playerDevice : MonoBehaviour
         {
             pancake.bakingScore = 0f;
         }
+    }
+
+    public void bakingSpeedChange(float coe, int stoveNum)
+    {
+        bakingCoe[stoveNum] = coe;
     }
 
     void OnMove(InputAction.CallbackContext ctx)
@@ -267,6 +285,7 @@ public struct Skillet
 public struct Pancake
 {
     public GameObject obj;
+    public GameObject[] visualObjs;
     public Rigidbody rb;
     public float bakingScore;
     public float bakingSpeed;
