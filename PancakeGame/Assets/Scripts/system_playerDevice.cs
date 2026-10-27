@@ -272,6 +272,7 @@ public class system_playerDevice : MonoBehaviour
                 bakingTimer = 0f;
             }
         }
+        UIManager.UpdateBakeUI(pancake.bakingScore);
         OverBakingCheck(ref pancake);
     }
 
