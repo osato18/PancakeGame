@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 3970482540169389689}
   - component: {fileID: 2175722080176319863}
   m_Layer: 0
-  m_Name: StrawBerry_single
+  m_Name: StrawBerry_tower_single
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
