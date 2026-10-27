@@ -38,12 +38,15 @@ public class UIManager : MonoBehaviour
         UIManager.UpdateItemUI(ItemsType.good, testCurrentItemNum);
     }
 
-    public static void UpdateItemUI(ItemsType updateItemType, int currentItemNum)
+
+    //デコレーションゲージの更新処理
+    public static void UpdateItemUI(ItemsType updateItemType,int currentItemNum)
     {
         _instance._itemGauges[(int)updateItemType].fillAmount = (float)currentItemNum / 5;
         Debug.Log(_instance._itemGauges[(int)updateItemType].fillAmount);
     }
 
+    //デコレーション層形成後にデコレーションゲージを０に戻す
     public static void ResetItemUI(ItemsType resetItemType)
     {
         _instance._itemGauges[(int)resetItemType].fillAmount = 0;
