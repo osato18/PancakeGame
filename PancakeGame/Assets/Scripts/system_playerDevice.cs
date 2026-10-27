@@ -101,13 +101,8 @@ public class system_playerDevice : MonoBehaviour
         skillet.obj.transform.position = skillet.linesObj[skillet.stoveNowNum].transform.position;
 
         skillet.pancake.visualObjs = new visualObj[5];
-
-        skillet.pancake.visualObjs[0].obj = Instantiate(visualPrefab[0], pancakeObj.transform.position + new Vector3(0f, 10f, 0f), pancakeObj.transform.rotation);
-        skillet.pancake.visualObjs[0].rb = skillet.pancake.visualObjs[0].obj.GetComponent<Rigidbody>();
-        skillet.pancake.visualObjs[0].obj.transform.parent = pancakeObj.transform;
-
-        visualObjNum = 1;
-        skillet.pancake.visualObjs[0].is_base = true;
+        visualObjNum = 0;
+        PancakeAdd(0);
 
         skillet.pancake.flying = false;
         skillet.pancake.bakingScore = 0f;
@@ -175,8 +170,11 @@ public class system_playerDevice : MonoBehaviour
 
     void PancakeMove(ref Pancake pancake)
     {
-        if (!pancake.flying && (skillet.stoveNowNum == skillet.stoveNextNum))
+        if (!pancake.flying && !pancake.visualObjs[0].flying && (skillet.stoveNowNum == skillet.stoveNextNum))
         {
+            skillet.pancake.flying = true;
+            pancake.visualObjs[0].flying = true;
+
             Debug.Log("GameJump");
             float f_Vel = pancake.topPos / pancake.jumpTime + GRAVITY * pancake.jumpTime / 2;
             pancake.rb.AddForce(new Vector3(0.0f, f_Vel, 0.0f), ForceMode.VelocityChange);
@@ -186,7 +184,7 @@ public class system_playerDevice : MonoBehaviour
                 {
                     continue;
                 }
-                pancake.visualObjs[i].rb.AddForce(new Vector3(0.0f, f_Vel, 0.0f), ForceMode.VelocityChange);
+                pancake.visualObjs[i].rb.AddForce(new Vector3(0.0f, f_Vel + i, 0.0f), ForceMode.VelocityChange);
             }
 
 
@@ -201,7 +199,6 @@ public class system_playerDevice : MonoBehaviour
                 pancake.surface = 0;
             }
 
-            skillet.pancake.flying = true;
         }
     }
 
@@ -267,7 +264,7 @@ public class system_playerDevice : MonoBehaviour
         }
         if (!pancake.flying)
         {
-            scoreSystem.SetFireScore(pancake.bakingScore);
+            //scoreSystem.SetFireScore(pancake.bakingScore);
             bakingTimer += Time.deltaTime * bakingCoe[skillet.stoveNowNum];
             if (bakingTimer >= 1)
             {
@@ -294,10 +291,14 @@ public class system_playerDevice : MonoBehaviour
 
     public void PancakeAdd(int addNum)
     {
+        if(visualObjNum >= 5)
+        {
+            return;
+        }
         skillet.pancake.visualObjs[visualObjNum].obj = Instantiate(visualPrefab[addNum], pancakeObj.transform.position + new Vector3(0f, 10f, 0f), pancakeObj.transform.rotation);
+        skillet.pancake.visualObjs[visualObjNum].obj.transform.SetParent(pancakeObj.transform);
         skillet.pancake.visualObjs[visualObjNum].rb = skillet.pancake.visualObjs[visualObjNum].obj.GetComponent<Rigidbody>();
-        skillet.pancake.visualObjs[visualObjNum].obj.transform.parent = pancakeObj.transform;
-
+        skillet.pancake.visualObjs[visualObjNum].flying = false;
         if (addNum == 0)
         {
             skillet.pancake.visualObjs[visualObjNum].is_base = true;
@@ -311,7 +312,15 @@ public class system_playerDevice : MonoBehaviour
 
     public void pancakeDelete()
     {
+        if(visualObjNum < 0)
+        {
+            return;
+        }
         Destroy(skillet.pancake.visualObjs[0].obj);
+        skillet.pancake.overBake[0] = false;
+        skillet.pancake.overBake[1] = false;
+        skillet.pancake.surface = 0;
+        visualObjNum--;
         for (int i = 1; i < 5; i++)
         {
             if (skillet.pancake.visualObjs[i].obj == null)
@@ -338,7 +347,14 @@ public class system_playerDevice : MonoBehaviour
 
     void OnCollisionEnter(Collision collision)
     {
-        skillet.pancake.flying = false;
+        if(collision.gameObject == pancakeObj)
+        {
+            skillet.pancake.flying = false;    
+        }
+        else if(collision.gameObject == skillet.pancake.visualObjs[0].obj)
+        {
+            skillet.pancake.visualObjs[0].flying = false;
+        }
     }
 }
 
@@ -373,4 +389,5 @@ public struct visualObj
     public GameObject obj;
     public Rigidbody rb;
     public bool is_base;
+    public bool flying;
 }
