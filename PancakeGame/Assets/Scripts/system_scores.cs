@@ -42,7 +42,7 @@ public class system_scores : MonoBehaviour
     public void SetFireScore(float setFireScore)
     {
         bakingScore = setFireScore;
-        fireScoreTxt.text = "Baking Score: " + bakingScore.ToString("F2");
+        //fireScoreTxt.text = "Baking Score: " + bakingScore.ToString("F2");
         bakingSlider.value = bakingScore;
     }
 

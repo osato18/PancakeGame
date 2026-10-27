@@ -30,8 +30,8 @@ public class system_playerDevice : MonoBehaviour
 
     private float moveTime = 0.0f;
 
-    private float[] bakingCoe = {1.0f, 1.0f, 1.0f};
-    
+    private float[] bakingCoe = { 1.0f, 1.0f, 1.0f };
+
     private int visualObjNum;
 
     void Awake()
@@ -101,9 +101,11 @@ public class system_playerDevice : MonoBehaviour
         skillet.obj.transform.position = skillet.linesObj[skillet.stoveNowNum].transform.position;
 
         skillet.pancake.visualObjs = new visualObj[5];
+
         skillet.pancake.visualObjs[0].obj = Instantiate(visualPrefab[0], pancakeObj.transform.position + new Vector3(0f, 10f, 0f), pancakeObj.transform.rotation);
         skillet.pancake.visualObjs[0].rb = skillet.pancake.visualObjs[0].obj.GetComponent<Rigidbody>();
         skillet.pancake.visualObjs[0].obj.transform.parent = pancakeObj.transform;
+
         visualObjNum = 1;
         skillet.pancake.visualObjs[0].is_base = true;
 
@@ -118,7 +120,7 @@ public class system_playerDevice : MonoBehaviour
         skillet.pancake.overBake[1] = false;
     }
 
-        void Update()
+    void Update()
     {
         SkilletMove(ref skillet);
         BakingScoring(ref skillet, ref skillet.pancake);
@@ -154,7 +156,7 @@ public class system_playerDevice : MonoBehaviour
 
     void SkilletMove(ref Skillet skillet)
     {
-        if(!(skillet.stoveNowNum == skillet.stoveNextNum))
+        if (!(skillet.stoveNowNum == skillet.stoveNextNum))
         {
 
 
@@ -163,7 +165,7 @@ public class system_playerDevice : MonoBehaviour
             skillet.obj.transform.position = Vector3.Lerp(skillet.linesObj[skillet.stoveNowNum].transform.position, skillet.linesObj[skillet.stoveNextNum].transform.position, moveTime);
 
 
-            if(moveTime >= 1.0f)
+            if (moveTime >= 1.0f)
             {
                 skillet.stoveNowNum = skillet.stoveNextNum;
                 moveTime = 0.0f;
@@ -178,7 +180,7 @@ public class system_playerDevice : MonoBehaviour
             Debug.Log("GameJump");
             float f_Vel = pancake.topPos / pancake.jumpTime + GRAVITY * pancake.jumpTime / 2;
             pancake.rb.AddForce(new Vector3(0.0f, f_Vel, 0.0f), ForceMode.VelocityChange);
-            for(int i = pancake.visualObjs.Length - 1; i >= 0; i--)
+            for (int i = pancake.visualObjs.Length - 1; i >= 0; i--)
             {
                 if (pancake.visualObjs[i].obj == null || pancake.visualObjs[i].rb == null)
                 {
@@ -188,12 +190,12 @@ public class system_playerDevice : MonoBehaviour
             }
 
 
-            if(pancake.surface == 0)
+            if (pancake.surface == 0)
             {
                 ResetBakingScore(ref pancake);
                 pancake.surface = 1;
             }
-            else if(pancake.surface == 1)
+            else if (pancake.surface == 1)
             {
                 ResetBakingScore(ref pancake);
                 pancake.surface = 0;
@@ -206,11 +208,11 @@ public class system_playerDevice : MonoBehaviour
     void virtualPancake(ref visualObj[] visualObjs)
     {
         Vector3 targetPosition = skilletObj.transform.position;
-        for(int i = 0; i < visualObjs.Length; i++)
+        for (int i = 0; i < visualObjs.Length; i++)
         {
             if (visualObjs[i].obj == null || visualObjs[i].rb == null)
             {
-               break;
+                break;
             }
             // Preserve the physics body's height and velocity so gravity and AddForce control Y.
             Rigidbody body = visualObjs[i].rb;
@@ -225,21 +227,21 @@ public class system_playerDevice : MonoBehaviour
     float spanTimer = 0f;
     void OverBakeDemerit()
     {
-        
+
         if (skillet.pancake.overBake[skillet.pancake.surface])
         {
             spanTimer += Time.deltaTime;
-            if(spanTimer >= 5f)
+            if (spanTimer >= 5f)
             {
                 scoreSystem.AddScore(-50);
                 spanTimer = 0f;
             }
         }
-        else if(spanTimer > 0.001)
+        else if (spanTimer > 0.001)
         {
             spanTimer = 0;
         }
-        
+
     }
 
 
@@ -249,7 +251,7 @@ public class system_playerDevice : MonoBehaviour
         {
             pancake.overBake[pancake.surface] = true;
         }
-        if(pancake.overBake[0] && pancake.overBake[1])
+        if (pancake.overBake[0] && pancake.overBake[1])
         {
             pancakeDelete();
         }
@@ -267,7 +269,7 @@ public class system_playerDevice : MonoBehaviour
         {
             scoreSystem.SetFireScore(pancake.bakingScore);
             bakingTimer += Time.deltaTime * bakingCoe[skillet.stoveNowNum];
-            if(bakingTimer >= 1)
+            if (bakingTimer >= 1)
             {
                 scoreSystem.AddScore((int)(pancake.bakingScore * p_bakingAddScore));
                 bakingTimer = 0f;
@@ -279,7 +281,7 @@ public class system_playerDevice : MonoBehaviour
     void ResetBakingScore(ref Pancake pancake)
     {
         pancake.bakingScore -= p_bakingResetScore;
-        if(pancake.bakingScore < 0f)
+        if (pancake.bakingScore < 0f)
         {
             pancake.bakingScore = 0f;
         }
@@ -290,14 +292,15 @@ public class system_playerDevice : MonoBehaviour
         bakingCoe[stoveNum] = coe;
     }
 
-    public void pancakeAdd(int addNum)
+    public void PancakeAdd(int addNum)
     {
         skillet.pancake.visualObjs[visualObjNum].obj = Instantiate(visualPrefab[addNum], pancakeObj.transform.position + new Vector3(0f, 10f, 0f), pancakeObj.transform.rotation);
         skillet.pancake.visualObjs[visualObjNum].rb = skillet.pancake.visualObjs[visualObjNum].obj.GetComponent<Rigidbody>();
         skillet.pancake.visualObjs[visualObjNum].obj.transform.parent = pancakeObj.transform;
-        if(addNum == 0)
+
+        if (addNum == 0)
         {
-            skillet.pancake.visualObjs[visualObjNum].is_base = true;   
+            skillet.pancake.visualObjs[visualObjNum].is_base = true;
         }
         else
         {
@@ -309,7 +312,7 @@ public class system_playerDevice : MonoBehaviour
     public void pancakeDelete()
     {
         Destroy(skillet.pancake.visualObjs[0].obj);
-        for(int i = 1; i < 5; i++)
+        for (int i = 1; i < 5; i++)
         {
             if (skillet.pancake.visualObjs[i].obj == null)
             {
@@ -320,7 +323,7 @@ public class system_playerDevice : MonoBehaviour
     }
 
     void OnMove(InputAction.CallbackContext ctx)
-    { 
+    {
         Vector2 move = ctx.ReadValue<Vector2>();
         SkilletControl(ref skillet, move);
     }

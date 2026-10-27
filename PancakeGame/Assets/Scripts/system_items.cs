@@ -10,7 +10,7 @@ public class system_items : MonoBehaviour
     private Items item;
 
     [SerializeField] private float speed;
-    private float speed_coe = 1.0f;
+    private float speed_coe = -1.0f;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -54,7 +54,7 @@ public class system_items : MonoBehaviour
     }
     IEnumerator Destroy()
     {
-        yield return new WaitForSeconds(5f);
+        yield return new WaitForSeconds(5000f);
         Destroy(gameObject);
     }
 }

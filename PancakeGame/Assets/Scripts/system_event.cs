@@ -52,7 +52,7 @@ public class system_event : MonoBehaviour
     {
         if((int)(scoresSys.timer) % 60 == 59 && !addFlag)
         {
-            playerDeviceSys.pancakeAdd(0);
+            playerDeviceSys.PancakeAdd(0);
             addFlag = true;
         }
         else if ((int)(scoresSys.timer) % 60 != 59 && addFlag)
