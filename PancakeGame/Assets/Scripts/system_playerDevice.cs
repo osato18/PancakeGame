@@ -105,7 +105,7 @@ public class system_playerDevice : MonoBehaviour
         skillet.obj.transform.position = skillet.linesObj[skillet.stoveNowNum].transform.position;
 
         skillet.pancake.visualObjs = new visualObj[5];
-        for(int i = 0; i < skillet.pancake.visualObjs.Length; i++)
+        for (int i = 0; i < skillet.pancake.visualObjs.Length; i++)
         {
             skillet.pancake.visualObjs[i].obj = visualObjs[i];
             skillet.pancake.visualObjs[i].obj.SetActive(false);
@@ -138,24 +138,22 @@ public class system_playerDevice : MonoBehaviour
 
     void SkilletControl(ref Skillet skillet, Vector2 moveVec)
     {
-        if (!skillet.pancake.flying)
+        if (moveVec.x > 0)
         {
-            if (moveVec.x > 0)
-            {
-                skillet.stoveNextNum = 2;
-                Debug.Log("SkilletControl: Move Right" + skillet.stoveNowNum + skillet.stoveNextNum);
-            }
-            else if (moveVec.x < 0)
-            {
-                skillet.stoveNextNum = 0;
-                Debug.Log("SkilletControl: Move Left" + skillet.stoveNowNum + skillet.stoveNextNum);
-            }
-            else if (moveVec.x == 0)
-            {
-                skillet.stoveNextNum = 1;
-                Debug.Log("SkilletControl: Move center" + skillet.stoveNowNum + skillet.stoveNextNum);
-            }
+            skillet.stoveNextNum = 2;
+            Debug.Log("SkilletControl: Move Right" + skillet.stoveNowNum + skillet.stoveNextNum);
         }
+        else if (moveVec.x < 0)
+        {
+            skillet.stoveNextNum = 0;
+            Debug.Log("SkilletControl: Move Left" + skillet.stoveNowNum + skillet.stoveNextNum);
+        }
+        else if (moveVec.x == 0)
+        {
+            skillet.stoveNextNum = 1;
+            Debug.Log("SkilletControl: Move center" + skillet.stoveNowNum + skillet.stoveNextNum);
+        }
+
     }
 
     void SkilletMove(ref Skillet skillet)
@@ -179,7 +177,7 @@ public class system_playerDevice : MonoBehaviour
 
     void PancakeMove(ref Pancake pancake)
     {
-        if (!pancake.flying && (skillet.stoveNowNum == skillet.stoveNextNum))
+        if (!pancake.flying)
         {
             Debug.Log("GameJump");
             float f_Vel = pancake.topPos / pancake.jumpTime + GRAVITY * pancake.jumpTime / 2;
@@ -290,7 +288,7 @@ public class system_playerDevice : MonoBehaviour
 
     public void PancakeAdd(int addNum)
     {
-        if(visualObjNum >= 5) return;
+        if (visualObjNum >= 5) return;
 
         GameObject cloneObj = Instantiate(visualPrefab[addNum], skilletObj.transform.position + new Vector3(0f, 10f, 0f), skilletObj.transform.rotation);
         system_visualObjs sysVis = cloneObj.GetComponent<system_visualObjs>();
@@ -315,7 +313,7 @@ public class system_playerDevice : MonoBehaviour
 
     public void pancakeDelete()
     {
-        if(visualObjNum < 0) return;
+        if (visualObjNum < 0) return;
         skillet.pancake.visualObjs[visualObjNum - 1].obj.SetActive(false);
         skillet.pancake.obj.transform.position += new Vector3(0f, 0.13f, 0f);
         visualObjNum--;
@@ -341,7 +339,7 @@ public class system_playerDevice : MonoBehaviour
 
     void OnCollisionEnter(Collision collision)
     {
-        if(collision.gameObject.layer != LayerMask.NameToLayer("visual"))   skillet.pancake.flying = false;
+        if (collision.gameObject.layer != LayerMask.NameToLayer("visual")) skillet.pancake.flying = false;
     }
 }
 
