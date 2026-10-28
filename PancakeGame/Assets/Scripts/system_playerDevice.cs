@@ -339,6 +339,9 @@ public class system_playerDevice : MonoBehaviour
     }
     void OnMoveCanceled(InputAction.CallbackContext ctx)
     {
+        // ★ キャンセル時（値が (0, 0) になったとき）も SkilletControl を呼び出す
+        Vector2 move = ctx.ReadValue<Vector2>();
+        SkilletControl(ref skillet, move);
     }
 
     void OnJump(InputAction.CallbackContext ctx)

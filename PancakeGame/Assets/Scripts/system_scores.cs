@@ -6,8 +6,8 @@ using UnityEngine.UI;
 public class system_scores : MonoBehaviour
 {
     [SerializeField] private TextMeshProUGUI scoreTxt;
-    [SerializeField] private TextMeshProUGUI fireScoreTxt;
-    [SerializeField] private Slider bakingSlider;
+    //[SerializeField] private TextMeshProUGUI fireScoreTxt;
+    //[SerializeField] private Slider bakingSlider;
     [SerializeField] private TextMeshProUGUI timerText;
     private int score = 0;
     private float bakingScore = 0.0f;
