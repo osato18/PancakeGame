@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 525182274751571430}
   - component: {fileID: -2982877257989023937}
   - component: {fileID: 5018844937470336482}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: item
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -126,6 +126,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b5c9bb07c9ac52c4aaa0f7e7bbc99273, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::system_items
+  scoresSystem: {fileID: 0}
   itemType: 0
   p_col: {fileID: 0}
   speed: -5

@@ -373,9 +373,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bb3aefb7c83904248b21761c5f6ae86d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::system_playerDevice
-  linesObj: []
+  linesObj:
+  - {fileID: 170519577}
+  - {fileID: 1806708706}
+  - {fileID: 928747343}
   skilletObj: {fileID: 537099373}
   pancakeObj: {fileID: 1017768242}
+  scoreSystem: {fileID: 1636639888}
   skilletAction:
     m_Name: Skillet
     m_Type: 0
@@ -392,51 +396,16 @@ MonoBehaviour:
     m_Id: b0d55e3a-9e73-4f76-8be7-dfc6531a9285
     m_Processors: 
     m_Interactions: 
-    m_SingletonActionBindings:
-    - m_Name: 2D Vector
-      m_Id: 895140b8-c441-48ba-9852-8695ac7a1793
-      m_Path: 2DVector
-      m_Interactions: 
-      m_Processors: 
-      m_Groups: 
-      m_Action: Pancake
-      m_Flags: 4
-    - m_Name: up
-      m_Id: 9a13ccc6-2896-40c1-b57f-3e567f066562
-      m_Path: 
-      m_Interactions: 
-      m_Processors: 
-      m_Groups: 
-      m_Action: Pancake
-      m_Flags: 8
-    - m_Name: down
-      m_Id: f52ade91-e47d-4be1-9ea4-ad85e58e031c
-      m_Path: 
-      m_Interactions: 
-      m_Processors: 
-      m_Groups: 
-      m_Action: Pancake
-      m_Flags: 8
-    - m_Name: left
-      m_Id: f48d9c75-72a5-47d9-8cdb-beeefe27cbaa
-      m_Path: 
-      m_Interactions: 
-      m_Processors: 
-      m_Groups: 
-      m_Action: Pancake
-      m_Flags: 8
-    - m_Name: right
-      m_Id: 5d433008-8119-4bee-b476-ae2000047659
-      m_Path: 
-      m_Interactions: 
-      m_Processors: 
-      m_Groups: 
-      m_Action: Pancake
-      m_Flags: 8
+    m_SingletonActionBindings: []
     m_Flags: 0
+  s_moveSpeed: 5
   p_jumpTime: 2
   p_topPos: 5
---- !u!1 &820684083
+  p_bakingSpeed: 0.5
+  p_bakingAddScore: 10
+  p_overbakingScore: 10
+  p_bakingResetScore: 3
+--- !u!1 &566757748
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
