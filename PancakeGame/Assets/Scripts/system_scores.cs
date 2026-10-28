@@ -43,14 +43,14 @@ public class system_scores : MonoBehaviour
     {
         bakingScore = setFireScore;
         //fireScoreTxt.text = "Baking Score: " + bakingScore.ToString("F2");
-        bakingSlider.value = bakingScore;
+        //bakingSlider.value = bakingScore;
     }
 
     public void AddFireScore(float addFireScore)
     {
         bakingScore += addFireScore;
-        fireScoreTxt.text = "Baking Score: " + bakingScore.ToString("F2");
-        bakingSlider.value = bakingScore;
+        //fireScoreTxt.text = "Baking Score: " + bakingScore.ToString("F2");
+        //bakingSlider.value = bakingScore;
     }
 
     void Timer()

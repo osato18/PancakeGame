@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 2231555361626405023}
   - component: {fileID: 5539206123107244368}
   - component: {fileID: 5257690103509067647}
+  - component: {fileID: -5858108585471974649}
   m_Layer: 7
   m_Name: PanCake_single
   m_TagString: Untagged
@@ -142,3 +143,16 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 0.15, z: 1}
   m_Center: {x: 0, y: 0.07, z: 0}
+--- !u!114 &-5858108585471974649
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6548913799794460841}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 126d216e6658a104680e05796c124a96, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::system_visualObjs
+  _PlayerDevice: {fileID: 0}
