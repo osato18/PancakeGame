@@ -13,5 +13,17 @@ public struct RelayPacket
     [MarshalAs(UnmanagedType.U1)]
     public bool buttonState;
     
-    public ushort tofSensor; // uint16_t (2 byte)
+    // bool 3つ分のフィールド（Cの bool tofDetected[3] に対応）
+    [MarshalAs(UnmanagedType.U1)]
+    public bool tofDetected0;
+    [MarshalAs(UnmanagedType.U1)]
+    public bool tofDetected1;
+    [MarshalAs(UnmanagedType.U1)]
+    public bool tofDetected2;
+
+    // 配列風にアクセスできる便利なプロパティ
+    public bool[] tofDetected
+    {
+        get => new bool[] { tofDetected0, tofDetected1, tofDetected2 };
+    }
 }
