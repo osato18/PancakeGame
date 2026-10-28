@@ -179,6 +179,9 @@ public class system_playerDevice : MonoBehaviour
     {
         if (!pancake.flying)
         {
+            skillet.pancake.flying = true;
+            pancake.visualObjs[0].flying = true;
+
             Debug.Log("GameJump");
             float f_Vel = pancake.topPos / pancake.jumpTime + GRAVITY * pancake.jumpTime / 2;
             pancake.rb.AddForce(new Vector3(0.0f, f_Vel, 0.0f), ForceMode.VelocityChange);
@@ -194,7 +197,6 @@ public class system_playerDevice : MonoBehaviour
                 pancake.surface = 0;
             }
 
-            skillet.pancake.flying = true;
         }
     }
 
@@ -261,7 +263,7 @@ public class system_playerDevice : MonoBehaviour
         }
         if (!pancake.flying)
         {
-            scoreSystem.SetFireScore(pancake.bakingScore);
+            //scoreSystem.SetFireScore(pancake.bakingScore);
             bakingTimer += Time.deltaTime * bakingCoe[skillet.stoveNowNum];
             if (bakingTimer >= 1)
             {
@@ -269,6 +271,7 @@ public class system_playerDevice : MonoBehaviour
                 bakingTimer = 0f;
             }
         }
+        UIManager.UpdateBakeUI(pancake.bakingScore);
         OverBakingCheck(ref pancake);
     }
 
@@ -330,6 +333,9 @@ public class system_playerDevice : MonoBehaviour
     }
     void OnMoveCanceled(InputAction.CallbackContext ctx)
     {
+        // ★ キャンセル時（値が (0, 0) になったとき）も SkilletControl を呼び出す
+        Vector2 move = ctx.ReadValue<Vector2>();
+        SkilletControl(ref skillet, move);
     }
 
     void OnJump(InputAction.CallbackContext ctx)
@@ -373,4 +379,5 @@ public struct visualObj
 {
     public GameObject obj;
     public bool is_base;
+    public bool flying;
 }

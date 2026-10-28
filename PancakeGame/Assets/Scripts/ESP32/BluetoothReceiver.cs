@@ -5,7 +5,6 @@ using System.IO.Ports;
 using System.Runtime.InteropServices;
 using System.Threading;
 using UnityEngine;
-using Unity.VisualScripting;
 
 public class BluetoothReceiver : MonoBehaviour
 {
@@ -17,12 +16,12 @@ public class BluetoothReceiver : MonoBehaviour
 
     private ESP32ControllerParser parser;
 
-    // ESP32の実際の送信用構造体に合わせたサイズ（ヘッダー2B + ペイロード26B = 28B）
-    private const int PACKET_SIZE = 28;
-    private const int PAYLOAD_SIZE = 26;
+    // ESP32の実際の送信用構造体に合わせたサイズ（ヘッダー2B + ペイロード29B = 31B）
+    private const int PACKET_SIZE = 31;
+    private const int PAYLOAD_SIZE = 29;
 
     //入力データ数値の閾値の為のScriptableObject
-    [SerializeField]private ControllerSettings _controllerSettings;
+    [SerializeField] private ControllerSettings _controllerSettings;
 
     void Start()
     {
@@ -85,7 +84,6 @@ public class BluetoothReceiver : MonoBehaviour
             }
             catch (Exception ex)
             {
-                // サブスレッドで直接ログを出さずキューに溜める
                 errorQueue.Enqueue($"Bluetooth受信エラー: {ex.Message}");
             }
         }
@@ -106,13 +104,11 @@ public class BluetoothReceiver : MonoBehaviour
 
     void Update()
     {
-        // メインスレッドでエラーログを出力
         while (errorQueue.TryDequeue(out string errorMsg))
         {
             Debug.LogError(errorMsg);
         }
 
-        // 受信パケットの処理
         while (receiveQueue.TryDequeue(out RelayPacket packet))
         {
             ParseData(packet);
@@ -138,7 +134,6 @@ public class BluetoothReceiver : MonoBehaviour
             bluetooth.Close();
         }
 
-        // --- アプリ終了時にCSVを出力する処理を追加 ---
         if (parser != null)
         {
             string fileName = $"ESP32_SensorLog_{System.DateTime.Now:yyyyMMdd_HHmmss}.csv";
