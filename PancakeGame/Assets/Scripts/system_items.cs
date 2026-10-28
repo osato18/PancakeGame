@@ -68,6 +68,6 @@ public struct Items
 
 public enum ItemsType
 {
-    good,
+    good=0,
     bad
 }

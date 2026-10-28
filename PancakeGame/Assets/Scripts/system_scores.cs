@@ -14,11 +14,14 @@ public class system_scores : MonoBehaviour
 
     public float timer = 0.0f;
 
+    [Header("時間制限[s]")]
+    [SerializeField] private float maxTime;
+
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        
+
     }
 
     // Update is called once per frame
@@ -30,13 +33,15 @@ public class system_scores : MonoBehaviour
     public void SetScore(int setScore)
     {
         score = setScore;
-        scoreTxt.text = "Score: " + score.ToString();
+        UIManager.UpdateScoreUI(score);
+        //scoreTxt.text = "Score: " + score.ToString();
     }
 
     public void AddScore(int addScore)
     {
         score += addScore;
-        scoreTxt.text = "Score: " + score.ToString();
+        UIManager.UpdateScoreUI(score);
+        //scoreTxt.text = "Score: " + score.ToString();
     }
 
     public void SetFireScore(float setFireScore)
@@ -55,7 +60,16 @@ public class system_scores : MonoBehaviour
 
     void Timer()
     {
+        //イベント用経過時間計算
         timer += Time.deltaTime;
-        timerText.text = "Time: " + timer.ToString("F1");
+        //timerText.text = "Time: " + timer.ToString("F1");
+
+        //カウントダウンタイマー用
+        if (maxTime > 0f)
+        {
+            maxTime -= Time.deltaTime;
+            maxTime = Mathf.Max(maxTime, 0f);
+        }
+        UIManager.UpdateTimerUI(maxTime);
     }
 }
