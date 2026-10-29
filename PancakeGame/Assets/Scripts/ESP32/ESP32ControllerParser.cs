@@ -7,11 +7,16 @@ using UnityEngine.InputSystem;
 public class ESP32ControllerParser
 {
     private ControllerSettings _conSetting;
+
     private byte isJump;
     private byte isButtonA;
 
-    // 前回閾値を超えていたかを保持するフラグ
-    private bool _wasOverJumpRange = false;
+    // 移動およびToFセンサー用のメンバ変数
+    private Vector2 _moveVector;
+    private bool _onMoveCalled;
+    private bool _tof0;
+    private bool _tof1;
+    private bool _tof2;
 
     // --- CSV出力用のデータ構造とリスト ---
     public struct SensorLogData
@@ -19,7 +24,12 @@ public class ESP32ControllerParser
         public float timestamp;       // 経過時間 (秒)
         public Vector3 accel;         // 加速度
         public Vector3 gyro;          // 角速度
-        public bool isJumpTriggered;  // ジャンプ判定が有効か (1 or 0)
+        public bool isJumpTriggered;  // ジャンプ判定が有効か
+        public bool tof0;             // tofDetected[0]
+        public bool tof1;             // tofDetected[1]
+        public bool tof2;             // tofDetected[2]
+        public Vector2 moveInput;     // OnMoveの入力値
+        public bool onMoveCalled;     // OnMoveが呼ばれた（入力が有効になった）か
     }
 
     private List<SensorLogData> _sensorLogs = new List<SensorLogData>();
@@ -37,15 +47,22 @@ public class ESP32ControllerParser
             return;
         }
 
-        InputInRange(packet);
+        // 各種入力・センサーのパース処理を実行
+        InputJumpInRange(packet);
+        InputMoveParse(packet);
 
-        // --- 受信したデータとジャンプ判定を時刻（Time.time）とともに記録 ---
+        // --- 受信したデータと各判定結果を時刻（Time.time）とともに記録 ---
         _sensorLogs.Add(new SensorLogData
         {
             timestamp = Time.time,
             accel = packet.imuAccel,
             gyro = packet.imuGyro,
-            isJumpTriggered = (isJump == 255)
+            isJumpTriggered = (isJump == 255),
+            tof0 = _tof0,
+            tof1 = _tof1,
+            tof2 = _tof2,
+            moveInput = _moveVector,
+            onMoveCalled = _onMoveCalled
         });
 
         // 受信データ（RelayPacket）を Input System 用の State 構造体に詰め替える
@@ -55,7 +72,7 @@ public class ESP32ControllerParser
             imuAccel = packet.imuAccel,
             imuGyro = packet.imuGyro,
             buttonA = isButtonA,
-            tofSensor = packet.tofSensor
+            move = _moveVector
         };
 
         // QueueStateEvent を使って Input System にデータを登録・更新する
@@ -65,11 +82,10 @@ public class ESP32ControllerParser
         );
     }
 
-    private void InputInRange(RelayPacket packet)
+    private void InputJumpInRange(RelayPacket packet)
     {
-        // 閾値を超えている間は 255 (Pressed: 1.0)、下回っている間は 0 (Released: 0.0) にする
         bool isOver;
-        if (packet.imuAccel.z >= 0 && Mathf.Abs(packet.imuAccel.z) >= _conSetting.jumpRangeMin)
+        if (Mathf.Abs(packet.imuAccel.z) >= _conSetting.jumpRangeMin)
         {
             isOver = true;
         }
@@ -80,10 +96,41 @@ public class ESP32ControllerParser
 
         isJump = isOver ? (byte)255 : (byte)0;
         isButtonA = isOver ? (byte)255 : (byte)0;
+    }
 
-        if (isButtonA == 255)
+    private void InputMoveParse(RelayPacket packet)
+    {
+        _moveVector = Vector2.zero;
+        _onMoveCalled = false;
+
+        bool[] tof = packet.tofDetected;
+        if (tof.Length >= 3)
         {
-            // Debug.Log("ControllerJump");
+            _tof0 = tof[0];
+            _tof1 = tof[1];
+            _tof2 = tof[2];
+
+            if (_tof0)
+            {
+                _moveVector = new Vector2(-1, 0);
+                _onMoveCalled = true;
+            }
+            else if (_tof1)
+            {
+                _moveVector = new Vector2(0, 0);
+                _onMoveCalled = true;
+            }
+            else if (_tof2)
+            {
+                _moveVector = new Vector2(1, 0);
+                _onMoveCalled = true;
+            }
+        }
+        else
+        {
+            _tof0 = false;
+            _tof1 = false;
+            _tof2 = false;
         }
     }
 
@@ -91,17 +138,21 @@ public class ESP32ControllerParser
     public void ExportToCSV(string filePath)
     {
         StringBuilder sb = new StringBuilder();
-        
-        // CSVのヘッダー行
-        sb.AppendLine("Timestamp,Accel_X,Accel_Y,Accel_Z,Gyro_X,Gyro_Y,Gyro_Z,IsJump");
+
+        // CSVのヘッダー行（ToFの検出状態、Moveの入力値、OnMove呼び出しフラグを追加）
+        sb.AppendLine("Timestamp,Accel_X,Accel_Y,Accel_Z,Gyro_X,Gyro_Y,Gyro_Z,IsJump,ToF_0,ToF_1,ToF_2,Move_X,Move_Y,OnMoveCalled");
 
         foreach (var log in _sensorLogs)
         {
-            // 小数点以下4桁でフォーマット
             string line = $"{log.timestamp:F4}," +
                           $"{log.accel.x:F4},{log.accel.y:F4},{log.accel.z:F4}," +
                           $"{log.gyro.x:F4},{log.gyro.y:F4},{log.gyro.z:F4}," +
-                          $"{(log.isJumpTriggered ? 1 : 0)}";
+                          $"{(log.isJumpTriggered ? 1 : 0)}," +
+                          $"{(log.tof0 ? 1 : 0)}," +
+                          $"{(log.tof1 ? 1 : 0)}," +
+                          $"{(log.tof2 ? 1 : 0)}," +
+                          $"{log.moveInput.x:F1},{log.moveInput.y:F1}," +
+                          $"{(log.onMoveCalled ? 1 : 0)}";
             sb.AppendLine(line);
         }
 

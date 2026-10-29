@@ -160,6 +160,12 @@ public class system_playerDevice : MonoBehaviour
             skillet.stoveNextNum = 1;
             Debug.Log("SkilletControl: Move center" + skillet.stoveNowNum + skillet.stoveNextNum);
         }
+        else if (moveVec.x == 0)
+        {
+            skillet.stoveNextNum = 1;
+            Debug.Log("SkilletControl: Move center" + skillet.stoveNowNum + skillet.stoveNextNum);
+        }
+
     }
 
     void SkilletMove(ref Skillet skillet)
@@ -317,6 +323,7 @@ public class system_playerDevice : MonoBehaviour
         skillet.pancake.visualObjs[visualObjNum].is_base = (typeNum == 0);
         skillet.pancake.visualObjs[visualObjNum].obj[typeNum].SetActive(true);
         visualObjNum++;
+        add_visualObjs.Remove(addObj);
     }
 
     public void PancakeDelete()
@@ -362,6 +369,9 @@ public class system_playerDevice : MonoBehaviour
     }
     void OnMoveCanceled(InputAction.CallbackContext ctx)
     {
+        // ★ キャンセル時（値が (0, 0) になったとき）も SkilletControl を呼び出す
+        Vector2 move = ctx.ReadValue<Vector2>();
+        SkilletControl(ref skillet, move);
     }
 
     void OnJump(InputAction.CallbackContext ctx)

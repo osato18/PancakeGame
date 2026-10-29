@@ -13,7 +13,7 @@ public class ESP32Controller : InputDevice
     public Vector3Control imuAccel { get; private set; }
     public Vector3Control imuGyro { get; private set; }
     public ButtonControl buttonA { get; private set; }
-    public IntegerControl tofSensor { get; private set; }
+    public Vector2Control move { get; private set; } // Vector2コントロールに変更
 
     protected override void FinishSetup()
     {
@@ -23,7 +23,7 @@ public class ESP32Controller : InputDevice
         imuAccel = GetChildControl<Vector3Control>("imuAccel");
         imuGyro = GetChildControl<Vector3Control>("imuGyro");
         buttonA = GetChildControl<ButtonControl>("buttonA");
-        tofSensor = GetChildControl<IntegerControl>("tofSensor");
+        move = GetChildControl<Vector2Control>("move");
     }
 
     public static ESP32Controller current { get; private set; }
@@ -47,7 +47,6 @@ public struct ESP32ControllerState : IInputStateTypeInfo
 {
     public FourCC format => new FourCC('E', 'S', 'P', '3');
 
-    // format = "BYTE" を追加
     [InputControl(name = "shakeFlag", layout = "Button", format = "BYTE")]
     public byte shakeFlag;
 
@@ -57,10 +56,9 @@ public struct ESP32ControllerState : IInputStateTypeInfo
     [InputControl(name = "imuGyro", layout = "Vector3")]
     public Vector3 imuGyro;
 
-    // format = "BYTE" を追加
     [InputControl(name = "buttonA", layout = "Button", format = "BYTE")]
     public byte buttonA;
 
-    [InputControl(name = "tofSensor", layout = "Integer")]
-    public ushort tofSensor;
+    [InputControl(name = "move", layout = "Vector2")]
+    public Vector2 move; // Vector2ステート
 }
