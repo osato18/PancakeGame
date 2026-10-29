@@ -18,13 +18,13 @@ public class system_event : MonoBehaviour
 
     void initialize()
     {
-        for(int i = 0; i < 3; i++)
+        for (int i = 0; i < 3; i++)
         {
             fireObjs[i].SetActive(false);
         }
     }
 
-    
+
     // Update is called once per frame
     void Update()
     {
@@ -44,44 +44,59 @@ public class system_event : MonoBehaviour
         {
             fireObjs[stoveNum].SetActive(false);
         }
-        playerDeviceSys.bakingSpeedChange(bakingCoe, stoveNum);
+        playerDeviceSys.BakingSpeedChange(bakingCoe, stoveNum);
     }
 
     bool addFlag = false;
     void EventAddPancake()
     {
-        if((int)(scoresSys.timer) % 60 == 59 && !addFlag)
-        {
-            playerDeviceSys.PancakeAdd(0);
-            addFlag = true;
-        }
-        else if ((int)(scoresSys.timer) % 60 != 59 && addFlag)
+        int second = (int)scoresSys.timer % 60;
+
+        if (second != 59)
         {
             addFlag = false;
+            return;
+        }
+
+        if (addFlag) return;
+
+        addFlag = true;
+        playerDeviceSys.DecorationAdd(0);
+    }
+
+    void EventAddDeco()
+    {   
+        int[] nums = new int[2];
+        nums = UIManager.GetItemNums(ItemsType.good);
+        if(nums[0] >= nums[1])
+        {
+            UIManager.ResetItemUI(ItemsType.good);
+            playerDeviceSys.DecorationAdd((int)ItemsType.good + 1);
         }
     }
 
     void EventGameOver()
     {
-        
+
     }
 
-    bool[] eventFlag = {false, false};
-    
+    bool[] eventFlag = { false, false };
+
     void EventManager()
     {
-        
-        if((int)(scoresSys.timer / 10) % 3 == 2 && !eventFlag[0])
+
+        if ((int)(scoresSys.timer / 10) % 3 == 2 && !eventFlag[0])
         {
             EventBigFire(10.0f, eventFlag[0]);
             eventFlag[0] = true;
         }
-        else if((int)(scoresSys.timer / 10) % 3 != 2 && eventFlag[0])
+        else if ((int)(scoresSys.timer / 10) % 3 != 2 && eventFlag[0])
         {
             EventBigFire(1.0f, eventFlag[0]);
             eventFlag[0] = false;
         }
 
         EventAddPancake();
+        EventAddDeco();
     }
 }

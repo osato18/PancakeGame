@@ -23,33 +23,45 @@ public class UIManager : MonoBehaviour
     [Header("タイマー表示用のTextオブジェクト")]
     [SerializeField] private TextMeshProUGUI _timerText;
 
+    [Header("各アイテムの最大数")]
+    [SerializeField] private int[] _itemMaxNums;
     private static UIManager _instance;
 
-    //test
-    public int testCurrentItemNum;
+    //
+    public int[] _currentItemNums;
 
     private void Awake()
     {
         _instance = this;
+        UpdateItemUI(ItemsType.good, _currentItemNums[(int)ItemsType.good]);
     }
 
     private void Update()
     {
-        UIManager.UpdateItemUI(ItemsType.good, testCurrentItemNum);
+       // UIManager.UpdateItemUI(ItemsType.good, _currentItemNums[(int)ItemsType.good]);
     }
 
 
     //デコレーションゲージの更新処理
     public static void UpdateItemUI(ItemsType updateItemType,int currentItemNum)
     {
-        _instance._itemGauges[(int)updateItemType].fillAmount = (float)currentItemNum / 5;
+        _instance._itemGauges[(int)updateItemType].fillAmount = (float)currentItemNum /_instance._itemMaxNums[(int)updateItemType];
         Debug.Log(_instance._itemGauges[(int)updateItemType].fillAmount);
+    }
+
+    public static int[] GetItemNums(ItemsType getItemType)
+    {
+        int[] nums = new int[2];
+        nums[0] = _instance._currentItemNums[(int)getItemType];
+        nums[1] = _instance._itemMaxNums[(int)getItemType];
+        return nums;
     }
 
     //デコレーション層形成後にデコレーションゲージを０に戻す
     public static void ResetItemUI(ItemsType resetItemType)
     {
         _instance._itemGauges[(int)resetItemType].fillAmount = 0;
+        _instance._currentItemNums[(int)resetItemType] = 0;
     }
 
     //PlayerDeviceから呼ぶ
