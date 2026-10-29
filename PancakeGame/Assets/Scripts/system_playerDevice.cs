@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using Unity.Mathematics;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -70,7 +71,7 @@ public class system_playerDevice : MonoBehaviour
     {
         // 登録
         skilletAction.performed += OnMove;
-        skilletAction.canceled += OnMoveCanceled;
+        //skilletAction.canceled += OnMoveCanceled;
         pancakeAction.started += OnJump;
     }
     void OnDisable()
@@ -79,7 +80,7 @@ public class system_playerDevice : MonoBehaviour
         if (skilletAction != null)
         {
             skilletAction.performed -= OnMove;
-            skilletAction.canceled -= OnMoveCanceled;
+            //skilletAction.canceled -= OnMoveCanceled;
         }
         if (pancakeAction != null)
         {
@@ -136,22 +137,23 @@ public class system_playerDevice : MonoBehaviour
         virtualPancake(add_visualObjs);
     }
 
-    void SkilletControl(ref Skillet skillet, Vector2 moveVec)
+    void SkilletControl(ref Skillet skillet, int moveInt)
     {
-        if (moveVec.x > 0)
-        {
-            skillet.stoveNextNum = 2;
-            Debug.Log("SkilletControl: Move Right" + skillet.stoveNowNum + skillet.stoveNextNum);
-        }
-        else if (moveVec.x < 0)
+        if (moveInt == 0)   //左
         {
             skillet.stoveNextNum = 0;
-            Debug.Log("SkilletControl: Move Left" + skillet.stoveNowNum + skillet.stoveNextNum);
+            Debug.Log("SkilletControl: Move Right" + skillet.stoveNowNum + skillet.stoveNextNum);
         }
-        else if (moveVec.x == 0)
+        else if (moveInt == 1)  //真ん中
         {
             skillet.stoveNextNum = 1;
             Debug.Log("SkilletControl: Move center" + skillet.stoveNowNum + skillet.stoveNextNum);
+
+        }
+        else if (moveInt == 2)  //右
+        {
+            skillet.stoveNextNum = 2;
+            Debug.Log("SkilletControl: Move Left" + skillet.stoveNowNum + skillet.stoveNextNum);
         }
 
     }
@@ -328,15 +330,24 @@ public class system_playerDevice : MonoBehaviour
 
     void OnMove(InputAction.CallbackContext ctx)
     {
-        Vector2 move = ctx.ReadValue<Vector2>();
-        SkilletControl(ref skillet, move);
+        //入力型を判定、テスト用にVector2も使えるようにしている
+        if (ctx.valueType == typeof(int))   //本番センサー
+        {
+            int moveInt = ctx.ReadValue<int>();
+            SkilletControl(ref skillet, moveInt);
+        }
+        else if (ctx.valueType == typeof(Vector2))  //テスト用
+        {
+            Vector2 moveVec = ctx.ReadValue<Vector2>();
+            SkilletControl(ref skillet, (int)moveVec.x + 1);
+        }
     }
-    void OnMoveCanceled(InputAction.CallbackContext ctx)
-    {
-        // ★ キャンセル時（値が (0, 0) になったとき）も SkilletControl を呼び出す
-        Vector2 move = ctx.ReadValue<Vector2>();
-        SkilletControl(ref skillet, move);
-    }
+    // void OnMoveCanceled(InputAction.CallbackContext ctx)
+    // {
+    //     // ★ キャンセル時（値が (0, 0) になったとき）も SkilletControl を呼び出す
+    //     Vector2 move = ctx.ReadValue<Vector2>();
+    //     SkilletControl(ref skillet, move);
+    // }
 
     void OnJump(InputAction.CallbackContext ctx)
     {

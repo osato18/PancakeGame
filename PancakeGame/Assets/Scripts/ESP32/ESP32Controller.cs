@@ -59,6 +59,6 @@ public struct ESP32ControllerState : IInputStateTypeInfo
     [InputControl(name = "buttonA", layout = "Button", format = "BYTE")]
     public byte buttonA;
 
-    [InputControl(name = "move", layout = "Vector2")]
-    public Vector2 move; // Vector2ステート
+    [InputControl(name = "move", layout = "int")]
+    public int move; // intステート
 }
