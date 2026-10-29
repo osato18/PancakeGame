@@ -4,9 +4,11 @@ using UnityEngine;
 using System.Reflection;
 using System;
 using Unity.Mathematics;
+using UnityEditor.IMGUI.Controls;
 
 public class system_itemsSpawner : MonoBehaviour
 {
+    [SerializeField] private UIManager uiManager;
     [SerializeField] private system_scores scoresSystem;
     [SerializeField] private GameObject[] itemObj;
     [SerializeField] private Transform[] spawnTrans = new Transform[2];
@@ -53,6 +55,7 @@ public class system_itemsSpawner : MonoBehaviour
         system_items system_Items = spawnObj.GetComponent<system_items>();
         system_Items.p_col = p_col;
         system_Items.scoresSystem = scoresSystem;
+        system_Items.uiManager = uiManager;
         int i = 0;
         foreach (system_items item in itemsSystem)
         {

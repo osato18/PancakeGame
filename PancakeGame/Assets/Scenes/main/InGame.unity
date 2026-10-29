@@ -596,7 +596,7 @@ MonoBehaviour:
     m_Flags: 0
   s_moveSpeed: 5
   p_jumpTime: 2
-  p_topPos: 5
+  p_topPos: 10
   p_bakingSpeed: 0.5
   p_bakingAddScore: 10
   p_overbakingScore: 10
@@ -1191,6 +1191,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 64916ae38167224459c23dad70906997, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::system_itemsSpawner
+  uiManager: {fileID: 1522151683}
   scoresSystem: {fileID: 1522151681}
   itemObj:
   - {fileID: 3104304538766542927, guid: 8eed3d6fe80abca47b7b2918d484a3b7, type: 3}
@@ -2438,6 +2439,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 64916ae38167224459c23dad70906997, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::system_itemsSpawner
+  uiManager: {fileID: 1522151683}
   scoresSystem: {fileID: 1522151681}
   itemObj:
   - {fileID: 3104304538766542927, guid: 8eed3d6fe80abca47b7b2918d484a3b7, type: 3}
@@ -3285,7 +3287,8 @@ MonoBehaviour:
   _maxBake: 10
   _scoreText: {fileID: 1810790047}
   _timerText: {fileID: 1377219946}
-  testCurrentItemNum: 0
+  _itemMaxNums: 05000000
+  _currentItemNums: 00000000
 --- !u!1 &1529935098
 GameObject:
   m_ObjectHideFlags: 0
@@ -3668,6 +3671,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 64916ae38167224459c23dad70906997, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::system_itemsSpawner
+  uiManager: {fileID: 1522151683}
   scoresSystem: {fileID: 1522151681}
   itemObj:
   - {fileID: 3104304538766542927, guid: 8eed3d6fe80abca47b7b2918d484a3b7, type: 3}

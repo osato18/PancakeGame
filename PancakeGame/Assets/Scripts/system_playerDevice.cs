@@ -116,7 +116,7 @@ public class system_playerDevice : MonoBehaviour
 
         }
         visualObjNum = 0;
-        PancakeAdd(0);
+        DecorationAdd(0);
 
         skillet.pancake.flying = false;
         skillet.pancake.bakingScore = 0f;
@@ -297,7 +297,7 @@ public class system_playerDevice : MonoBehaviour
         bakingCoe[stoveNum] = coe;
     }
 
-    public void PancakeAdd(int addNum)
+    public void DecorationAdd(int addNum)
     {
         if(visualObjNum >= 5) return;
 

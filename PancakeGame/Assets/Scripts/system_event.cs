@@ -52,7 +52,7 @@ public class system_event : MonoBehaviour
     {
         int second = (int)scoresSys.timer % 60;
 
-        if (second != 59 && second != 30)
+        if (second != 59)
         {
             addFlag = false;
             return;
@@ -61,8 +61,20 @@ public class system_event : MonoBehaviour
         if (addFlag) return;
 
         addFlag = true;
-        playerDeviceSys.PancakeAdd(second == 59 ? 0 : 1);
+        playerDeviceSys.DecorationAdd(0);
     }
+
+    void EventAddDeco()
+    {   
+        int[] nums = new int[2];
+        nums = UIManager.GetItemNums(ItemsType.good);
+        if(nums[0] >= nums[1])
+        {
+            UIManager.ResetItemUI(ItemsType.good);
+            playerDeviceSys.DecorationAdd((int)ItemsType.good + 1);
+        }
+    }
+
     void EventGameOver()
     {
 
@@ -85,5 +97,6 @@ public class system_event : MonoBehaviour
         }
 
         EventAddPancake();
+        EventAddDeco();
     }
 }
