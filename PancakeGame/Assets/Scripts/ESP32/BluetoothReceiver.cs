@@ -26,12 +26,12 @@ public class BluetoothReceiver : MonoBehaviour
     void Start()
     {
         parser = new ESP32ControllerParser(_controllerSettings);
-        
+
         try
         {
-            bluetooth = new SerialPort("COM5", 115200);
+            bluetooth = new SerialPort("COM7", 115200);
             bluetooth.Open();
-            Debug.Log("COM5 ポートを正常に開きました");
+            Debug.Log("COM7 ポートを正常に開きました");
         }
         catch (Exception ex)
         {
@@ -61,19 +61,62 @@ public class BluetoothReceiver : MonoBehaviour
                         buffer.Add(tempBuffer[i]);
                     }
 
-                    while (buffer.Count >= PACKET_SIZE)
+                    // --- 混入したテキストやゴミを検知してスキップする処理 ---
+                    while (true)
                     {
-                        if (buffer[0] == 0xAA && buffer[1] == 0xCC)
+                        // 1. 同期ヘッダー (0xAA, 0xCC) の位置を探す
+                        int headerIndex = -1;
+                        for (int i = 0; i <= buffer.Count - 2; i++)
                         {
-                            byte[] packetBytes = buffer.GetRange(2, PAYLOAD_SIZE).ToArray();
-                            RelayPacket packet = ByteArrayToStructure<RelayPacket>(packetBytes);
-                            
-                            receiveQueue.Enqueue(packet);
-                            buffer.RemoveRange(0, PACKET_SIZE);
+                            if (buffer[i] == 0xAA && buffer[i + 1] == 0xCC)
+                            {
+                                headerIndex = i;
+                                break;
+                            }
+                        }
+
+                        // ヘッダーが見つかった場合
+                        if (headerIndex >= 0)
+                        {
+                            if (headerIndex > 0)
+                            {
+                                // ==========================================
+                                // ★ 不一致（ヘッダーの手前にあるゴミ）を検知したときのデバッグログ
+                                // ==========================================
+                                string garbage = System.Text.Encoding.ASCII.GetString(buffer.GetRange(0, headerIndex).ToArray());
+                                Debug.LogWarning($"[データ不一致・ゴミ検知] 正しいヘッダーの手前にある {headerIndex} バイトをスキップします。\n【混入していたデータ】: {garbage.Trim()}");
+
+                                buffer.RemoveRange(0, headerIndex);
+                            }
+
+                            // 2. ヘッダーが先頭にきた状態で、1パケット分（31バイト）たまっているか確認
+                            if (buffer.Count >= PACKET_SIZE)
+                            {
+                                byte[] packetBytes = buffer.GetRange(2, PAYLOAD_SIZE).ToArray();
+                                RelayPacket packet = ByteArrayToStructure<RelayPacket>(packetBytes);
+
+                                receiveQueue.Enqueue(packet);
+                                buffer.RemoveRange(0, PACKET_SIZE);
+                            }
+                            else
+                            {
+                                // ヘッダーはあるが、パケット全体のデータがまだ揃っていないので次の受信を待つ
+                                break;
+                            }
                         }
                         else
                         {
-                            buffer.RemoveAt(0);
+                            // ==========================================
+                            // ★ バッファ内にヘッダーが一切見つからない場合のデバッグログ
+                            // ==========================================
+                            if (buffer.Count > PACKET_SIZE * 20)
+                            {
+                                string overflowGarbage = System.Text.Encoding.ASCII.GetString(buffer.ToArray());
+                                Debug.LogError($"[ヘッダー未検出] 有効なヘッダー(0xAA, 0xCC)が一切見つからないため、溜まったバッファ({buffer.Count}バイト)を破棄します。\n【受信データ全文】: {overflowGarbage}");
+
+                                buffer.RemoveRange(0, buffer.Count - PACKET_SIZE);
+                            }
+                            break;
                         }
                     }
                 }
@@ -88,7 +131,6 @@ public class BluetoothReceiver : MonoBehaviour
             }
         }
     }
-
     private T ByteArrayToStructure<T>(byte[] bytes) where T : struct
     {
         GCHandle handle = GCHandle.Alloc(bytes, GCHandleType.Pinned);
