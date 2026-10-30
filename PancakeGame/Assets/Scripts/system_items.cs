@@ -11,6 +11,8 @@ public class system_items : MonoBehaviour
 
     [SerializeField] private float speed;
     private float speed_coe = -1.0f;
+
+    public UIManager uiManager;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -32,6 +34,8 @@ public class system_items : MonoBehaviour
         if (items.type.Equals(ItemsType.good))
         {
             scoresSystem.AddScore(100);
+            uiManager._currentItemNums[(int)items.type]++;
+            UIManager.UpdateItemUI(items.type, uiManager._currentItemNums[(int)items.type]);
         }
         else if (items.type.Equals(ItemsType.bad))
         {

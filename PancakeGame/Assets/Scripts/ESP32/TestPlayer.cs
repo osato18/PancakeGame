@@ -12,7 +12,7 @@ public class TestPlayer : MonoBehaviour
         if (value.isPressed)
         {
             AudioManager.PlaySE("test_se");
-            EffectManager.PlayEffect("TestEffect_NotLoop",gameObject.transform.position);
+            EffectManager.PlayEffect("ItemGetEffect_Sphere005_Particle_Glow",gameObject.transform.position);
             Debug.Log("OnJump!");
         }    
     }

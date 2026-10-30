@@ -12,8 +12,10 @@ public class system_playerDevice : MonoBehaviour
     [SerializeField] private GameObject[] linesObj;
     [SerializeField] private GameObject skilletObj;
     [SerializeField] private GameObject pancakeObj;
-    [SerializeField] private GameObject[] visualObjs = new GameObject[5];
+    [SerializeField] private GameObject[] visualTransObjs = new GameObject[5];
     [SerializeField] private GameObject[] visualPrefab;
+    [SerializeField] private GameObject[] placePrefab;
+    [SerializeField] private GameObject[] topPlacePrefab;
     private Skillet skillet;
 
     [SerializeField] private system_scores scoreSystem;
@@ -36,6 +38,7 @@ public class system_playerDevice : MonoBehaviour
     private float[] bakingCoe = { 1.0f, 1.0f, 1.0f };
 
     private int visualObjNum;
+    private GameObject[,] stay_visualObjs = new GameObject[3, 5];
 
     private List<GameObject> add_visualObjs = new List<GameObject>();
 
@@ -105,14 +108,14 @@ public class system_playerDevice : MonoBehaviour
 
         skillet.obj.transform.position = skillet.linesObj[skillet.stoveNowNum].transform.position;
 
-        skillet.pancake.visualObjs = new visualObj[5];
+        skillet.pancake.visualObjs = new VisualObj[5];
         for (int i = 0; i < skillet.pancake.visualObjs.Length; i++)
         {
-            skillet.pancake.visualObjs[i].obj = visualObjs[i];
-            skillet.pancake.visualObjs[i].obj.SetActive(false);
+            skillet.pancake.visualObjs[i].obj = visualTransObjs[i];
+            skillet.pancake.visualObjs[i].objTypeNums = new List<int>();
         }
         visualObjNum = 0;
-        PancakeAdd(0);
+        DecorationAdd(0);
 
         skillet.pancake.flying = false;
         skillet.pancake.bakingScore = 0f;
@@ -123,6 +126,8 @@ public class system_playerDevice : MonoBehaviour
         skillet.pancake.overBake = new bool[2];
         skillet.pancake.overBake[0] = false;
         skillet.pancake.overBake[1] = false;
+
+        //UIManager.UpdateBakeUI(skillet.pancake.bakingScore);
     }
 
     void Update()
@@ -134,7 +139,7 @@ public class system_playerDevice : MonoBehaviour
 
     void FixedUpdate()
     {
-        virtualPancake(add_visualObjs);
+        VirtualPancake(add_visualObjs);
     }
 
     void SkilletControl(ref Skillet skillet, int moveInt)
@@ -155,6 +160,11 @@ public class system_playerDevice : MonoBehaviour
             skillet.stoveNextNum = 2;
             Debug.Log("SkilletControl: Move Left" + skillet.stoveNowNum + skillet.stoveNextNum);
         }
+        else if (moveVec.x == 0)
+        {
+            skillet.stoveNextNum = 1;
+            Debug.Log("SkilletControl: Move center" + skillet.stoveNowNum + skillet.stoveNextNum);
+        }
 
     }
 
@@ -162,8 +172,6 @@ public class system_playerDevice : MonoBehaviour
     {
         if (!(skillet.stoveNowNum == skillet.stoveNextNum))
         {
-
-
             moveTime += Time.deltaTime * skillet.MoveSpeed;
             Debug.Log($"SkilletMove: MoveTime {moveTime}, NowNum {skillet.stoveNowNum}, NextNum {skillet.stoveNextNum}");
             skillet.obj.transform.position = Vector3.Lerp(skillet.linesObj[skillet.stoveNowNum].transform.position, skillet.linesObj[skillet.stoveNextNum].transform.position, moveTime);
@@ -182,7 +190,6 @@ public class system_playerDevice : MonoBehaviour
         if (!pancake.flying)
         {
             skillet.pancake.flying = true;
-            pancake.visualObjs[0].flying = true;
 
             Debug.Log("GameJump");
             float f_Vel = pancake.topPos / pancake.jumpTime + GRAVITY * pancake.jumpTime / 2;
@@ -202,7 +209,7 @@ public class system_playerDevice : MonoBehaviour
         }
     }
 
-    void virtualPancake(List<GameObject> visualObjs)
+    void VirtualPancake(List<GameObject> visualObjs)
     {
         Vector3 targetPosition = skilletObj.transform.position;
         for (int i = 0; i < visualObjs.Count; i++)
@@ -251,13 +258,18 @@ public class system_playerDevice : MonoBehaviour
         {
             skillet.pancake.overBake[0] = false;
             skillet.pancake.overBake[1] = false;
-            pancakeDelete();
+            pancake.bakingScore = 0f;
+            DecorationDelete();
         }
     }
 
     float bakingTimer = 0f;
     void BakingScoring(ref Skillet skillet, ref Pancake pancake)
     {
+        if (visualObjNum <= 0)
+        {
+            return;
+        }
         pancake.bakingScore += bakingCoe[skillet.stoveNowNum] * pancake.bakingSpeed * Time.deltaTime;
         if (pancake.overBake[pancake.surface])
         {
@@ -265,15 +277,15 @@ public class system_playerDevice : MonoBehaviour
         }
         if (!pancake.flying)
         {
-            //scoreSystem.SetFireScore(pancake.bakingScore);
+            scoreSystem.SetFireScore(pancake.bakingScore);
             bakingTimer += Time.deltaTime * bakingCoe[skillet.stoveNowNum];
             if (bakingTimer >= 1)
             {
                 scoreSystem.AddScore((int)(pancake.bakingScore * p_bakingAddScore));
                 bakingTimer = 0f;
             }
+            UIManager.UpdateBakeUI(pancake.bakingScore);
         }
-        UIManager.UpdateBakeUI(pancake.bakingScore);
         OverBakingCheck(ref pancake);
     }
 
@@ -286,48 +298,178 @@ public class system_playerDevice : MonoBehaviour
         }
     }
 
-    public void bakingSpeedChange(float coe, int stoveNum)
+    public void BakingSpeedChange(float coe, int stoveNum)
     {
         bakingCoe[stoveNum] = coe;
     }
 
-    public void PancakeAdd(int addNum)
+    // visualObjNum is the number of occupied pancake levels.
+    bool TryGetDecorationIndex(int typeNum, out int index)
     {
-        if (visualObjNum >= 5) return;
+        index = typeNum == 0 ? visualObjNum + 1 : visualObjNum;
+        if(visualObjNum <= 0)
+        {
+            visualObjNum = 0;
+            index = 0;
+        } 
+        if (typeNum < 0 || typeNum >= stay_visualObjs.GetLength(0) ||
+            index < 0 || index >= skillet.pancake.visualObjs.Length)
+            return false;
+
+        return stay_visualObjs[typeNum, index] == null;
+    }
+
+    bool ValidatePlacedDecoration(int typeNum)
+    {
+        if (typeNum == 1 && topPlacePrefab[typeNum] == null)
+        {
+            Debug.LogError("system_playerDevice: Top Place Prefab を設定してください。", this);
+            return false;
+        }
+
+        if (placePrefab == null || typeNum >= placePrefab.Length || placePrefab[typeNum] == null)
+        {
+            Debug.LogError($"system_playerDevice: Place Prefab[{typeNum}] を設定してください。", this);
+            return false;
+        }
+
+        // Check every destination because this decoration can move down later.
+        foreach (VisualObj slot in skillet.pancake.visualObjs)
+        {
+            if (slot.obj == null)
+            {
+                Debug.LogError($"system_playerDevice: 種類 {typeNum} の配置位置を全段に設定してください。", this);
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public void DecorationAdd(int addNum)
+    {
+        if (!TryGetDecorationIndex(addNum, out _) || !ValidatePlacedDecoration(addNum)) return;
+        if (visualPrefab == null || addNum >= visualPrefab.Length || visualPrefab[addNum] == null)
+        {
+            Debug.LogError($"system_playerDevice: Visual Prefab[{addNum}] を設定してください。", this);
+            return;
+        }
 
         GameObject cloneObj = Instantiate(visualPrefab[addNum], skilletObj.transform.position + new Vector3(0f, 10f, 0f), skilletObj.transform.rotation);
         system_visualObjs sysVis = cloneObj.GetComponent<system_visualObjs>();
+        if (sysVis == null)
+        {
+            Debug.LogError("system_playerDevice: 落下用Prefabに system_visualObjs が必要です。", this);
+            Destroy(cloneObj);
+            return;
+        }
         sysVis._PlayerDevice = this;
         add_visualObjs.Add(cloneObj);
-        if (addNum == 0)
-        {
-            skillet.pancake.visualObjs[visualObjNum].is_base = true;
-        }
-        else
-        {
-            skillet.pancake.visualObjs[visualObjNum].is_base = false;
-        }
     }
 
-    public void PancakeActive(GameObject addObj)
+    public void DecorationActive(GameObject addObj, int typeNum)
     {
-        skillet.pancake.visualObjs[visualObjNum].obj.SetActive(true);
-        visualObjNum++;
-        add_visualObjs.Remove(addObj);
-    }
+        if (!add_visualObjs.Remove(addObj)) return;
 
-    public void pancakeDelete()
-    {
-        if (visualObjNum < 0) return;
-        skillet.pancake.visualObjs[visualObjNum - 1].obj.SetActive(false);
-        skillet.pancake.obj.transform.position += new Vector3(0f, 0.13f, 0f);
-        visualObjNum--;
-        if (!skillet.pancake.visualObjs[visualObjNum].is_base)
+        // Recheck at landing: the stack may have changed during the fall.
+        if (!TryGetDecorationIndex(typeNum, out int index) || !ValidatePlacedDecoration(typeNum)) return;
+
+        VisualObj[] slots = skillet.pancake.visualObjs;
+        Transform marker = slots[index].obj.transform;
+        bool isTop = typeNum == 1 && index == visualObjNum - 1;
+        GameObject prefab = isTop ? topPlacePrefab[typeNum] : placePrefab[typeNum];
+        Vector3 spawnPosition = marker.position;
+
+        GameObject instance = Instantiate(
+            prefab, spawnPosition, marker.rotation, marker
+        );
+
+        if(typeNum == 1)
         {
-            pancakeDelete();
+            Vector3 temp = instance.transform.localPosition;
+            temp.y -= 0.55f;
+            instance.transform.localPosition = temp;
+        }
+
+        stay_visualObjs[typeNum, index] = instance;
+        instance.SetActive(true);
+        slots[index].objTypeNums.Add(typeNum);
+        slots[index].is_base = slots[index].objTypeNums.Contains(0);
+        if (typeNum == 0)
+        {
+            visualObjNum++;
+
+            // The previous top level is now covered by the new pancake.
+            int previousTopIndex = index - 1;
+            if (previousTopIndex >= 0 && stay_visualObjs[1, previousTopIndex] != null)
+            {
+                ReplaceStrawberry(previousTopIndex, placePrefab[1]);
+            }
         }
     }
+    void ReplaceStrawberry(int index, GameObject prefab)
+    {
+        GameObject oldObj = stay_visualObjs[1, index];
+        if (oldObj == null) return;
+        if (prefab == null)
+        {
+            Debug.LogError("system_playerDevice: 通常のイチゴ用 Place Prefab[1] を設定してください。", this);
+            return;
+        }
 
+        Transform marker = skillet.pancake.visualObjs[index].obj.transform;
+        GameObject newObj = Instantiate(prefab, marker.position, marker.rotation, marker);
+
+        // Destroy is deferred, so hide the old appearance immediately.
+        oldObj.SetActive(false);
+        Destroy(oldObj);
+        stay_visualObjs[1, index] = newObj;
+        newObj.SetActive(true);
+    }
+
+    public void DecorationDelete()
+    {
+        VisualObj[] slots = skillet.pancake.visualObjs;
+        if (visualObjNum <= 0) return;
+
+        do
+        {
+            // Delete all placed decorations at the bottom, leaving the markers intact.
+            for (int type = 0; type < stay_visualObjs.GetLength(0); type++)
+            {
+                GameObject instance = stay_visualObjs[type, 0];
+                if (instance != null)
+                {
+                    instance.SetActive(false);
+                    Destroy(instance);
+                }
+                stay_visualObjs[type, 0] = null;
+            }
+
+            // Move instances and metadata down; never replace the marker references.
+            for (int i = 0; i < visualObjNum; i++)
+            {
+                for (int type = 0; type < stay_visualObjs.GetLength(0); type++)
+                {
+                    GameObject instance = stay_visualObjs[type, i + 1];
+                    stay_visualObjs[type, i] = instance;
+                    stay_visualObjs[type, i + 1] = null;
+                    if (instance == null) continue;
+
+                    Transform marker = slots[i].obj.transform;
+                    instance.transform.SetParent(marker, true);
+                    instance.transform.SetPositionAndRotation(marker.position, marker.rotation);
+                }
+                slots[i].objTypeNums = new List<int>(slots[i + 1].objTypeNums);
+                slots[i].is_base = slots[i].objTypeNums.Contains(0);
+            }
+
+            slots[visualObjNum].objTypeNums.Clear();
+            slots[visualObjNum].is_base = false;
+            visualObjNum--;
+        }
+        while (visualObjNum >= 0 && !slots[0].is_base);
+        
+    }
     void OnMove(InputAction.CallbackContext ctx)
     {
         //入力型を判定、テスト用にVector2も使えるようにしている
@@ -374,7 +516,7 @@ public struct Skillet
 public struct Pancake
 {
     public GameObject obj;
-    public visualObj[] visualObjs;
+    public VisualObj[] visualObjs;
     public Rigidbody rb;
     public float bakingScore;
     public float bakingSpeed;
@@ -386,9 +528,9 @@ public struct Pancake
     public Collider col;
 }
 
-public struct visualObj
+public struct VisualObj
 {
     public GameObject obj;
+    public List<int> objTypeNums;
     public bool is_base;
-    public bool flying;
 }
