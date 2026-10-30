@@ -398,13 +398,20 @@ public class system_playerDevice : MonoBehaviour
 
             // The previous top level is now covered by the new pancake.
             int previousTopIndex = index - 1;
-            if (previousTopIndex >= 0 && stay_visualObjs[1, previousTopIndex] != null)
+            for(int i = 0; i < stay_visualObjs.GetLength(0); i++)
             {
-                ReplaceStrawberry(previousTopIndex, placePrefab[1]);
+                if (previousTopIndex >= 0 && stay_visualObjs[i, previousTopIndex] != null)
+                {
+                    foreach(int objTypeNum in slots[previousTopIndex].objTypeNums)
+                    {
+                        ReplaceDecoration(previousTopIndex, objTypeNum, placePrefab[objTypeNum]);   
+                    }
+                }
             }
         }
     }
-    void ReplaceStrawberry(int index, GameObject prefab)
+
+    void ReplaceDecoration(int index, int  typeNum, GameObject prefab)
     {
         GameObject oldObj = stay_visualObjs[1, index];
         if (oldObj == null) return;
@@ -416,6 +423,14 @@ public class system_playerDevice : MonoBehaviour
 
         Transform marker = skillet.pancake.visualObjs[index].obj.transform;
         GameObject newObj = Instantiate(prefab, marker.position, marker.rotation, marker);
+
+        if(typeNum == 1)
+        {
+            Vector3 temp = newObj.transform.localPosition;
+            temp.y -= 0.55f;
+            newObj.transform.localPosition = temp;
+        }
+
 
         // Destroy is deferred, so hide the old appearance immediately.
         oldObj.SetActive(false);
