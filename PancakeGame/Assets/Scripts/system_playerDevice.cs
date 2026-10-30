@@ -160,12 +160,6 @@ public class system_playerDevice : MonoBehaviour
             skillet.stoveNextNum = 2;
             Debug.Log("SkilletControl: Move Left" + skillet.stoveNowNum + skillet.stoveNextNum);
         }
-        else if (moveVec.x == 0)
-        {
-            skillet.stoveNextNum = 1;
-            Debug.Log("SkilletControl: Move center" + skillet.stoveNowNum + skillet.stoveNextNum);
-        }
-
     }
 
     void SkilletMove(ref Skillet skillet)
