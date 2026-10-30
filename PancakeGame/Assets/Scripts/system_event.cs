@@ -1,6 +1,9 @@
 using System;
 using TMPro;
+using Unity.VectorGraphics;
+using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class system_event : MonoBehaviour
 {
@@ -9,6 +12,8 @@ public class system_event : MonoBehaviour
     [SerializeField] private system_scores scoresSys;
     [SerializeField] private GameObject[] fireObjs = new GameObject[3];
     [SerializeField] private GameObject scoreBoard;
+    [SerializeField] private GameObject cautionPrefab;
+    [SerializeField] private Transform[] stoveTrans = new Transform[3];
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -29,6 +34,12 @@ public class system_event : MonoBehaviour
     void Update()
     {
         EventManager();
+    }
+
+    void EventFireCaution(int stoveNum)
+    {
+        Vector3 stovePos = stoveTrans[stoveNum].position;
+        //stovePos.y += 
     }
 
     int stoveNum = 0;
@@ -75,9 +86,9 @@ public class system_event : MonoBehaviour
         }
     }
 
-    void EventGameOver()
+    public void EventSceneManager(string sceneName)
     {
-
+        SceneManager.LoadScene(sceneName);
     }
 
     bool[] eventFlag = { false, false };

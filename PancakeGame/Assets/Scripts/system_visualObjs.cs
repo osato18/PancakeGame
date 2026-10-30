@@ -28,7 +28,7 @@ public class system_visualObjs : MonoBehaviour
         }
 
         activated = true; // 呼び出す前に立てる
-        _PlayerDevice.PancakeActive(gameObject, typeNum);
+        _PlayerDevice.DecorationActive(gameObject, typeNum);
         Destroy(gameObject);
     }
 }
