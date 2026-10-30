@@ -3496,6 +3496,11 @@ MonoBehaviour:
   - {fileID: 3678341}
   - {fileID: 590438725}
   scoreBoard: {fileID: 1810790045}
+  cautionPrefab: {fileID: 0}
+  stoveTrans:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
 --- !u!1 &1810790045
 GameObject:
   m_ObjectHideFlags: 0
