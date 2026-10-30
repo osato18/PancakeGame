@@ -12,7 +12,7 @@ public class ESP32ControllerParser
     private byte isButtonA;
 
     // 移動およびToFセンサー用のメンバ変数
-    private Vector2 _moveVector;
+    private int _moveInt;
     private bool _onMoveCalled;
     private bool _tof0;
     private bool _tof1;
@@ -28,7 +28,7 @@ public class ESP32ControllerParser
         public bool tof0;             // tofDetected[0]
         public bool tof1;             // tofDetected[1]
         public bool tof2;             // tofDetected[2]
-        public Vector2 moveInput;     // OnMoveの入力値
+        public int moveInput;     // OnMoveの入力値(int)
         public bool onMoveCalled;     // OnMoveが呼ばれた（入力が有効になった）か
     }
 
@@ -61,7 +61,7 @@ public class ESP32ControllerParser
             tof0 = _tof0,
             tof1 = _tof1,
             tof2 = _tof2,
-            moveInput = _moveVector,
+            moveInput = _moveInt,
             onMoveCalled = _onMoveCalled
         });
 
@@ -72,7 +72,7 @@ public class ESP32ControllerParser
             imuAccel = packet.imuAccel,
             imuGyro = packet.imuGyro,
             buttonA = isButtonA,
-            move = _moveVector
+            move = _moveInt
         };
 
         // QueueStateEvent を使って Input System にデータを登録・更新する
@@ -100,7 +100,7 @@ public class ESP32ControllerParser
 
     private void InputMoveParse(RelayPacket packet)
     {
-        _moveVector = Vector2.zero;
+        int beforeMoveInput=_moveInt;   //前回の入力
         _onMoveCalled = false;
 
         bool[] tof = packet.tofDetected;
@@ -112,17 +112,22 @@ public class ESP32ControllerParser
 
             if (_tof0)
             {
-                _moveVector = new Vector2(-1, 0);
+                _moveInt = 0;
                 _onMoveCalled = true;
             }
             else if (_tof1)
             {
-                _moveVector = new Vector2(0, 0);
+                _moveInt = 1;
                 _onMoveCalled = true;
             }
             else if (_tof2)
             {
-                _moveVector = new Vector2(1, 0);
+                _moveInt = 2;
+                _onMoveCalled = true;
+            }
+            else
+            {
+                _moveInt = beforeMoveInput;
                 _onMoveCalled = true;
             }
         }
@@ -151,7 +156,7 @@ public class ESP32ControllerParser
                           $"{(log.tof0 ? 1 : 0)}," +
                           $"{(log.tof1 ? 1 : 0)}," +
                           $"{(log.tof2 ? 1 : 0)}," +
-                          $"{log.moveInput.x:F1},{log.moveInput.y:F1}," +
+                          $"{log.moveInput:F1}," +
                           $"{(log.onMoveCalled ? 1 : 0)}";
             sb.AppendLine(line);
         }
