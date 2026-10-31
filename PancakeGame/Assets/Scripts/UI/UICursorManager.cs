@@ -1,7 +1,7 @@
-
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class UICursorManager : MonoBehaviour
 {
@@ -66,17 +66,19 @@ public class UICursorManager : MonoBehaviour
         }
     }
 
-    private void StartButtonClick()
+    public void StartButtonClick()
     {
         Debug.Log("スタート！");
+        SceneManager.LoadScene("InGame");
     }
 
-    private void TutorialButtonClick()
+    public void TutorialButtonClick()
     {
         Debug.Log("チュートリアル");
+        SceneManager.LoadScene("Tutorial");
     }
 
-    private void CreditButtonClick()
+    public void CreditButtonClick()
     {
         Debug.Log("クレジット");
     }

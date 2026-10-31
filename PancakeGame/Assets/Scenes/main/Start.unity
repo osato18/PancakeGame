@@ -385,7 +385,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 635571269}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 35562195}
+        m_TargetAssemblyTypeName: UICursorManager, Assembly-CSharp
+        m_MethodName: CreditButtonClick
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &635571269
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -565,7 +577,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 766547733}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 35562195}
+        m_TargetAssemblyTypeName: UICursorManager, Assembly-CSharp
+        m_MethodName: TutorialButtonClick
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &766547733
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -793,7 +817,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1083358513}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 35562195}
+        m_TargetAssemblyTypeName: UICursorManager, Assembly-CSharp
+        m_MethodName: StartButtonClick
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1083358513
 MonoBehaviour:
   m_ObjectHideFlags: 0
