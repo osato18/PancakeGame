@@ -20,6 +20,8 @@ public class system_event : MonoBehaviour
     void Start()
     {
         initialize();
+        //BGM再生
+        AudioManager.PlayBGM("playingBGM");
     }
 
     void initialize()

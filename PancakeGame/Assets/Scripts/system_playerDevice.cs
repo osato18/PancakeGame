@@ -244,12 +244,14 @@ public class system_playerDevice : MonoBehaviour
 
     IEnumerator overBakePan(float waitSpan, Action nextAction, Pancake pancake)
     {
+        //ReplaceDecoration内で煙作成
         ReplaceDecoration(0, 0, overBakePrefab);
         //ここ絶対に後で直す
         yield return new WaitForSeconds(waitSpan);
+        
         pancake.overBake = false;
         pancake.bakingScore = 0f;
-        //ここに今から書く
+        
 
         nextAction?.Invoke();
     }

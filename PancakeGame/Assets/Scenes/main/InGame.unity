@@ -5474,7 +5474,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 94f6ee1c75650b54ea2bf6bac9ef59db, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AudioManager
-  bgmClips: []
+  bgmClips:
+  - {fileID: 8300000, guid: a2687dc0d2c3af54b95df4d0431b83bb, type: 3}
+  - {fileID: 8300000, guid: 665daaa6c3d831248b46fd11acf60dbb, type: 3}
+  - {fileID: 8300000, guid: 499e18cb68d35224c9cca8d4d678e37d, type: 3}
   seClips: []
 --- !u!4 &762389330
 Transform:
