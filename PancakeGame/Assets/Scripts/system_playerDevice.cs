@@ -32,6 +32,8 @@ public class system_playerDevice : MonoBehaviour
     [SerializeField] private float p_bakingAddScore;
     [SerializeField] private float p_overbakingScore;
     [SerializeField] private float p_bakingResetScore;
+
+
     
 
     private float GRAVITY = 3.141592f;
