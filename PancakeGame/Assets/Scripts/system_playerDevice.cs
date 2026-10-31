@@ -642,6 +642,28 @@ public class system_playerDevice : MonoBehaviour
     {
         return addFlag[typeNum];
     }
+
+
+    //リザルトスコアの格納
+    public void SaveDataForScoreCalculation()
+    {
+        // 構造体配列をディープコピー（参照を切って複製）して保持する
+        int length = skillet.pancake.visualObjs.Length;
+        GameDataHolder.SavedVisualObjs = new VisualObj[length];
+        
+        for (int i = 0; i < length; i++)
+        {
+            GameDataHolder.SavedVisualObjs[i] = new VisualObj
+            {
+                obj = null, // シーン移行で破棄されるためGameObjectの参照は基本切るか、必要ならプレハブID等にする
+                objTypeNums = new List<int>(skillet.pancake.visualObjs[i].objTypeNums),
+                is_base = skillet.pancake.visualObjs[i].is_base
+            };
+        }
+        GameDataHolder.SavedVisualObjNum = visualObjNum;
+        
+        Debug.Log("リザルト用のパンケーキデータを保存しました。");
+    }
 }
 
 public struct Skillet
