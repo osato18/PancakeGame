@@ -1,9 +1,7 @@
 using System;
-using System.Collections;
 using TMPro;
 using Unity.VectorGraphics;
 using Unity.VisualScripting;
-using UnityEditor.IMGUI.Controls;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -14,7 +12,8 @@ public class system_event : MonoBehaviour
     [SerializeField] private system_scores scoresSys;
     [SerializeField] private GameObject[] fireObjs = new GameObject[3];
     [SerializeField] private GameObject scoreBoard;
-    [SerializeField] private GameObject[] cautionObj = new GameObject[3];
+    [SerializeField] private GameObject cautionPrefab;
+    [SerializeField] private Transform[] stoveTrans = new Transform[3];
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -28,10 +27,6 @@ public class system_event : MonoBehaviour
         {
             fireObjs[i].SetActive(false);
         }
-                for(int i = 0; i < cautionObj.Length; i++)
-        {
-            cautionObj[i].SetActive(false);
-        }
     }
 
 
@@ -41,12 +36,10 @@ public class system_event : MonoBehaviour
         EventManager();
     }
 
-    IEnumerator EventFireCaution(int stoveNum, float waitSpan, Action nextAction)
+    void EventFireCaution(int stoveNum)
     {
-        cautionObj[stoveNum].SetActive(true);
-        yield return new WaitForSeconds(waitSpan);
-        cautionObj[stoveNum].SetActive(false);
-        nextAction?.Invoke();
+        Vector3 stovePos = stoveTrans[stoveNum].position;
+        //stovePos.y += 
     }
 
     int stoveNum = 0;
@@ -56,7 +49,7 @@ public class system_event : MonoBehaviour
         {
             int r = UnityEngine.Random.Range(0, 1000) % 3;
             stoveNum = r;
-            StartCoroutine(EventFireCaution(stoveNum, 1.0f, () => fireObjs[stoveNum].SetActive(true)));
+            fireObjs[stoveNum].SetActive(true);
         }
         else
         {
@@ -92,7 +85,12 @@ public class system_event : MonoBehaviour
             playerDeviceSys.DecorationAdd((int)ItemsType.good + 1);
         }
     }
-    
+
+    public void EventSceneManager(string sceneName)
+    {
+        SceneManager.LoadScene(sceneName);
+    }
+
     bool[] eventFlag = { false, false };
 
     void EventManager()
