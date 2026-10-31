@@ -13,7 +13,7 @@ public class ESP32Controller : InputDevice
     public Vector3Control imuAccel { get; private set; }
     public Vector3Control imuGyro { get; private set; }
     public ButtonControl buttonA { get; private set; }
-    public Vector2Control move { get; private set; } // Vector2コントロールに変更
+    public IntegerControl move { get; private set; } // Vector2コントロールに変更
 
     protected override void FinishSetup()
     {
@@ -23,7 +23,7 @@ public class ESP32Controller : InputDevice
         imuAccel = GetChildControl<Vector3Control>("imuAccel");
         imuGyro = GetChildControl<Vector3Control>("imuGyro");
         buttonA = GetChildControl<ButtonControl>("buttonA");
-        move = GetChildControl<Vector2Control>("move");
+        move = GetChildControl<IntegerControl>("move");
     }
 
     public static ESP32Controller current { get; private set; }
@@ -59,6 +59,6 @@ public struct ESP32ControllerState : IInputStateTypeInfo
     [InputControl(name = "buttonA", layout = "Button", format = "BYTE")]
     public byte buttonA;
 
-    [InputControl(name = "move", layout = "int")]
+    [InputControl(name = "move", layout = "Integer",format = "INT")]
     public int move; // intステート
 }

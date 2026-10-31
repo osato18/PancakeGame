@@ -12,7 +12,7 @@ public class ESP32ControllerParser
     private byte isButtonA;
 
     // 移動およびToFセンサー用のメンバ変数
-    private int _moveInt;
+    private int _moveInt=1;
     private bool _onMoveCalled;
     private bool _tof0;
     private bool _tof1;
@@ -145,8 +145,7 @@ public class ESP32ControllerParser
         StringBuilder sb = new StringBuilder();
 
         // CSVのヘッダー行（ToFの検出状態、Moveの入力値、OnMove呼び出しフラグを追加）
-        sb.AppendLine("Timestamp,Accel_X,Accel_Y,Accel_Z,Gyro_X,Gyro_Y,Gyro_Z,IsJump,ToF_0,ToF_1,ToF_2,Move_X,Move_Y,OnMoveCalled");
-
+sb.AppendLine("Timestamp,Accel_X,Accel_Y,Accel_Z,Gyro_X,Gyro_Y,Gyro_Z,IsJump,ToF_0,ToF_1,ToF_2,Move,OnMoveCalled");
         foreach (var log in _sensorLogs)
         {
             string line = $"{log.timestamp:F4}," +
@@ -156,7 +155,7 @@ public class ESP32ControllerParser
                           $"{(log.tof0 ? 1 : 0)}," +
                           $"{(log.tof1 ? 1 : 0)}," +
                           $"{(log.tof2 ? 1 : 0)}," +
-                          $"{log.moveInput:F1}," +
+                          $"{log.moveInput}," +
                           $"{(log.onMoveCalled ? 1 : 0)}";
             sb.AppendLine(line);
         }
