@@ -26,6 +26,15 @@ public class UIManager : MonoBehaviour
     [SerializeField] private int[] _itemMaxNums;
     private static UIManager _instance;
 
+    public static RectTransform ItemGaugeRect(ItemsType type) =>
+        _instance != null && _instance._itemGauges != null && (int)type >= 0 &&
+        (int)type < _instance._itemGauges.Length && _instance._itemGauges[(int)type] != null
+            ? _instance._itemGauges[(int)type].rectTransform : null;
+    public static RectTransform BakeGaugeRect =>
+        _instance != null && _instance._bakeGauge != null ? _instance._bakeGauge.rectTransform : null;
+    public static RectTransform ScoreRect =>
+        _instance != null && _instance._scoreText != null ? _instance._scoreText.rectTransform : null;
+
     //
     public int[] _currentItemNums;
 
