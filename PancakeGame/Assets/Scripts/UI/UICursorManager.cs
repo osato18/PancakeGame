@@ -82,4 +82,10 @@ public class UICursorManager : MonoBehaviour
     {
         Debug.Log("クレジット");
     }
+
+    public void ReturnStartButtonClick()
+    {
+        Debug.Log("スタートに戻る");
+        SceneManager.LoadScene("Start");
+    }
 }
