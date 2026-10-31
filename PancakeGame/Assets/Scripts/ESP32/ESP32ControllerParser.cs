@@ -85,7 +85,7 @@ public class ESP32ControllerParser
     private void InputJumpInRange(RelayPacket packet)
     {
         bool isOver;
-        if (Mathf.Abs(packet.imuAccel.z) >= _conSetting.jumpRangeMin)
+        if (Mathf.Abs(packet.imuGyro.z) >= _conSetting.jumpRangeMin)
         {
             isOver = true;
         }

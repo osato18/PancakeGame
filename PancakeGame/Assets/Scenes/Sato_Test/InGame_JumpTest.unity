@@ -2202,6 +2202,7 @@ MonoBehaviour:
   - {fileID: 1447044972334649316, guid: 031b26e126a7a284fae77f4142380180, type: 3}
   topPlacePrefab:
   - {fileID: 1447044972334649316, guid: 031b26e126a7a284fae77f4142380180, type: 3}
+  - {fileID: 1447044972334649316, guid: 031b26e126a7a284fae77f4142380180, type: 3}
   overBakePrefab: {fileID: 3015303501366533203, guid: e519b04473a45734b8762ff912de5662, type: 3}
   scoreSystem: {fileID: 1522151681}
   skilletAction:
@@ -6378,7 +6379,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BluetoothReceiver
   _controllerSettings: {fileID: 11400000, guid: bd9099b5f25e4bc43954b4f5768f9818, type: 2}
-  portName: COM4
+  portName: COM7
 --- !u!114 &937008615
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -12783,6 +12784,7 @@ MonoBehaviour:
   - {fileID: 482172484}
   - {fileID: 2122114837}
   - {fileID: 1614049801}
+  bigFireSpeedCoe: 5
 --- !u!1001 &1807117514
 PrefabInstance:
   m_ObjectHideFlags: 0

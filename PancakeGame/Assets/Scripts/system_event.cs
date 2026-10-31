@@ -14,6 +14,7 @@ public class system_event : MonoBehaviour
     [SerializeField] private GameObject[] fireObjs = new GameObject[3];
     [SerializeField] private GameObject scoreBoard;
     [SerializeField] private GameObject[] cautionObj = new GameObject[3];
+    [SerializeField] private float bigFireSpeedCoe;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -99,7 +100,7 @@ public class system_event : MonoBehaviour
 
         if ((int)(scoresSys.timer / 10) % 3 == 2 && !eventFlag[0])
         {
-            EventBigFire(10.0f, eventFlag[0]);
+            EventBigFire(bigFireSpeedCoe, eventFlag[0]);
             eventFlag[0] = true;
         }
         else if ((int)(scoresSys.timer / 10) % 3 != 2 && eventFlag[0])
