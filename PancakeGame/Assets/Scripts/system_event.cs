@@ -11,6 +11,7 @@ public class system_event : MonoBehaviour
     [SerializeField] private system_itemsSpawner[] itemsSpawnerSys = new system_itemsSpawner[3];
     [SerializeField] private system_playerDevice playerDeviceSys;
     [SerializeField] private system_scores scoresSys;
+    [SerializeField] private GameObject[] normalfireObjs=new GameObject[3];//通常のコンロの火
     [SerializeField] private GameObject[] fireObjs = new GameObject[3];
     [SerializeField] private GameObject scoreBoard;
     [SerializeField] private GameObject[] cautionObj = new GameObject[3];
@@ -42,6 +43,7 @@ public class system_event : MonoBehaviour
 
     IEnumerator EventFireCaution(int stoveNum, float waitSpan, Action nextAction)
     {
+
         cautionObj[stoveNum].SetActive(true);
         yield return new WaitForSeconds(waitSpan);
         cautionObj[stoveNum].SetActive(false);
@@ -55,11 +57,16 @@ public class system_event : MonoBehaviour
         {
             int r = UnityEngine.Random.Range(0, 1000) % 3;
             stoveNum = r;
+            //通常火false
+            normalfireObjs[stoveNum].SetActive(false);
             StartCoroutine(EventFireCaution(stoveNum, 1.0f, () => fireObjs[stoveNum].SetActive(true)));
         }
         else
         {
+            //普通の火戻す
+            normalfireObjs[stoveNum].SetActive(true);
             fireObjs[stoveNum].SetActive(false);
+
         }
         playerDeviceSys.BakingSpeedChange(bakingCoe, stoveNum);
     }

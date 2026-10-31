@@ -46,7 +46,16 @@ public class EffectManager : MonoBehaviour
         if (instance.effectDictionary.TryGetValue(name, out GameObject prefab))
         {
             // 指定された座標にエフェクトを生成
-            Instantiate(prefab, position, Quaternion.identity);
+            if (name == "PancakeBurn_Smoke")
+            {
+            Instantiate(prefab, position, Quaternion.Euler(-90f,0f,0f));    
+            }
+            else
+            {
+            Instantiate(prefab, position, Quaternion.identity);    
+            }
+            
+            
         }
         else
         {

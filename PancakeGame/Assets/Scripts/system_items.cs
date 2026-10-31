@@ -12,6 +12,8 @@ public class system_items : MonoBehaviour
     [SerializeField] private float speed;
     private float speed_coe = -1.0f;
 
+    
+
     public UIManager uiManager;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -53,6 +55,8 @@ public class system_items : MonoBehaviour
         if (other.Equals(p_col))
         {
             Scoring(ref item);
+            Vector3 pos=this.transform.position;
+           EffectManager.PlayEffect("ItemGetEffect_Sphere005_Particle_Glow",pos);
             Destroy(gameObject);
         }
     }

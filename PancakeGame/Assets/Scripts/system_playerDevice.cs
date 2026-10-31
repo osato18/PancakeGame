@@ -32,6 +32,7 @@ public class system_playerDevice : MonoBehaviour
     [SerializeField] private float p_bakingAddScore;
     [SerializeField] private float p_overbakingScore;
     [SerializeField] private float p_bakingResetScore;
+    
 
     private float GRAVITY = 3.141592f;
 
@@ -244,9 +245,11 @@ public class system_playerDevice : MonoBehaviour
     IEnumerator overBakePan(float waitSpan, Action nextAction, Pancake pancake)
     {
         ReplaceDecoration(0, 0, overBakePrefab);
+        //ここ絶対に後で直す
         yield return new WaitForSeconds(waitSpan);
         pancake.overBake = false;
         pancake.bakingScore = 0f;
+        //ここに今から書く
 
         nextAction?.Invoke();
     }
@@ -428,6 +431,8 @@ public class system_playerDevice : MonoBehaviour
 
         Transform marker = skillet.pancake.visualObjs[index].obj.transform;
         GameObject newObj = Instantiate(prefab, marker.position, marker.rotation, marker);
+        //こげエフェクト生成
+        EffectManager.PlayEffect("PancakeBurn_Smoke",marker.position);
 
         if(typeNum == 1)
         {
