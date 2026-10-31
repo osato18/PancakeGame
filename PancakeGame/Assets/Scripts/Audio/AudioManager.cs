@@ -17,6 +17,8 @@ public class AudioManager : MonoBehaviour
     private Dictionary<string, AudioClip> bgmDictionary = new Dictionary<string, AudioClip>();
     private Dictionary<string, AudioClip> seDictionary = new Dictionary<string, AudioClip>();
 
+    private bool burn;
+
     private void Awake()
     {
         if (instance == null)
@@ -72,8 +74,10 @@ public class AudioManager : MonoBehaviour
 
         if (instance.seDictionary.TryGetValue(name, out AudioClip clip))
         {
+                            
             instance.seAudioSource.PlayOneShot(clip);
         }
+        
         else
         {
             Debug.LogWarning("指定されたSE" + name + "が見つかりません");

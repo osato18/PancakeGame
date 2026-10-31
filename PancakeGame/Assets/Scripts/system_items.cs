@@ -27,6 +27,8 @@ public class system_items : MonoBehaviour
         travelSign = Mathf.Sign(p_col.bounds.center.z - transform.position.z);
     }
 
+    
+
     public UIManager uiManager;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -98,6 +100,21 @@ public class system_items : MonoBehaviour
         {
             resolved = true;
             Scoring(ref item);
+            
+            Vector3 pos=this.transform.position;
+            //バフエフェクト生成と効果音再生
+            if (item.type.Equals(ItemsType.good))
+            {
+                EffectManager.PlayEffect("ItemGetEffect_Sphere005_Particle_Glow",pos);
+                AudioManager.PlaySE("BuffGet");
+            }
+            //デバフ時のパーティクル生成と効果音再生
+            else if (item.type.Equals(ItemsType.bad))
+            {
+                EffectManager.PlayEffect("DebuffEffect",pos);
+                AudioManager.PlaySE("Debuffitem");
+            }
+           
             if (tutorialItem) TutorialResolved?.Invoke(true);
             Destroy(gameObject);
         }

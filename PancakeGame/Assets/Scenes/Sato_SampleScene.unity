@@ -482,7 +482,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2756668714378084473, guid: b89000da2b0fd6140be49aa924073bfb, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.38629404
+      value: 3.72
       objectReference: {fileID: 0}
     - target: {fileID: 2756668714378084473, guid: b89000da2b0fd6140be49aa924073bfb, type: 3}
       propertyPath: m_LocalPosition.z
@@ -856,6 +856,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BluetoothReceiver
   _controllerSettings: {fileID: 11400000, guid: bd9099b5f25e4bc43954b4f5768f9818, type: 2}
+  portName: COM7
 --- !u!114 &1243200237
 MonoBehaviour:
   m_ObjectHideFlags: 0

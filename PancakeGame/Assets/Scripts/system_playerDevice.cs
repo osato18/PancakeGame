@@ -33,6 +33,9 @@ public class system_playerDevice : MonoBehaviour
     [SerializeField] private float p_overbakingScore;
     [SerializeField] private float p_bakingResetScore;
 
+
+    
+
     private float GRAVITY = 3.141592f;
 
     private float moveTime = 0.0f;
@@ -253,6 +256,8 @@ public class system_playerDevice : MonoBehaviour
         {
             ResetBakingScore(ref pancake);
             skillet.pancake.flying = true;
+            //ジャンプ時の効果音再生
+            AudioManager.PlaySE("Flypancake");
 
             lastJumpPhysicsTime = Time.fixedTime;
 
@@ -292,6 +297,7 @@ public class system_playerDevice : MonoBehaviour
             if (spanTimer >= 5f)
             {
                 scoreSystem.AddScore(-50);
+                
                 spanTimer = 0f;
             }
         }
@@ -304,6 +310,18 @@ public class system_playerDevice : MonoBehaviour
 
     IEnumerator overBakePan(float waitSpan)
     {
+        //ReplaceDecoration内で煙作成
+        ReplaceDecoration(0, 0, overBakePrefab);
+        //パンケーキこげたときの音再生
+        AudioManager.PlaySE("Burned");
+        //ここ絶対に後で直す
+        yield return new WaitForSeconds(waitSpan);
+
+        pancake.overBake = false;
+        pancake.bakingScore = 0f;
+        
+
+        nextAction?.Invoke();
         if (overBakePrefab != null) ReplaceDecoration(0, 0, overBakePrefab);
         yield return new WaitForSeconds(waitSpan);
         DecorationDelete();
@@ -319,6 +337,11 @@ public class system_playerDevice : MonoBehaviour
         if (pancake.bakingScore >= p_overbakingScore && !pancake.overBake)
         {
             pancake.overBake = true;
+            
+        }
+        if (pancake.overBake)
+        {
+            StartCoroutine(overBakePan(0.5f, () => DecorationDelete(), pancake));
             BurnStarted?.Invoke();
             burnRoutine = StartCoroutine(overBakePan(0.5f));
         }
@@ -501,6 +524,9 @@ public class system_playerDevice : MonoBehaviour
 
         Transform marker = skillet.pancake.visualObjs[index].obj.transform;
         GameObject newObj = Instantiate(prefab, marker.position, marker.rotation, marker);
+        //こげエフェクト生成
+        EffectManager.PlayEffect("PancakeBurn_Smoke",marker.position);
+        
 
         if(typeNum == 1)
         {
@@ -649,6 +675,12 @@ public class system_playerDevice : MonoBehaviour
 
     void OnCollisionEnter(Collision collision)
     {
+        if (collision.gameObject.layer != LayerMask.NameToLayer("visual"))
+        {
+          skillet.pancake.flying = false;
+          EffectManager.PlayEffect("Pancake_LandingSmoke_Opaque (1)",pancakeObj.transform.position);
+          AudioManager.PlaySE("Pancakedown");  
+        } 
         CheckPancakeLanding(collision);
     }
 
