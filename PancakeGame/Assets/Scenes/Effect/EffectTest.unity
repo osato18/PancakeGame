@@ -5465,7 +5465,14 @@ MonoBehaviour:
   - {fileID: 8300000, guid: a2687dc0d2c3af54b95df4d0431b83bb, type: 3}
   - {fileID: 8300000, guid: 665daaa6c3d831248b46fd11acf60dbb, type: 3}
   - {fileID: 8300000, guid: 499e18cb68d35224c9cca8d4d678e37d, type: 3}
-  seClips: []
+  seClips:
+  - {fileID: 8300000, guid: 7ae1b9905757bc74f975d0d1eb9fbbfa, type: 3}
+  - {fileID: 8300000, guid: 18f30d477a7609d41962713c133957dc, type: 3}
+  - {fileID: 8300000, guid: 5f9e8ce1113f25f4d94ae1367c49d561, type: 3}
+  - {fileID: 8300000, guid: 9f1df197659423944afba0f11844df95, type: 3}
+  - {fileID: 8300000, guid: 1506ed384df441045aa9bbbcb940f708, type: 3}
+  - {fileID: 8300000, guid: 2c0dbc4fb3e39a840b3639d351e8c3f4, type: 3}
+  - {fileID: 8300000, guid: 2a5518b4fe7e32546a326ef68423e340, type: 3}
 --- !u!4 &762389330
 Transform:
   m_ObjectHideFlags: 0
