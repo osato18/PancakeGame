@@ -249,6 +249,8 @@ public class system_playerDevice : MonoBehaviour
     {
         //ReplaceDecoration内で煙作成
         ReplaceDecoration(0, 0, overBakePrefab);
+        //パンケーキこげたときの音再生
+        AudioManager.PlaySE("Burned");
         //ここ絶対に後で直す
         yield return new WaitForSeconds(waitSpan);
 
@@ -439,8 +441,7 @@ public class system_playerDevice : MonoBehaviour
         GameObject newObj = Instantiate(prefab, marker.position, marker.rotation, marker);
         //こげエフェクト生成
         EffectManager.PlayEffect("PancakeBurn_Smoke",marker.position);
-        //パンケーキこげたときの音再生
-        AudioManager.PlaySE("Burned");
+        
 
         if(typeNum == 1)
         {
