@@ -570,6 +570,7 @@ MonoBehaviour:
   topPlacePrefab:
   - {fileID: 3604349274617590880, guid: b7ff9f2c8215d2549b55d1348819d6c8, type: 3}
   - {fileID: 1447044972334649316, guid: 031b26e126a7a284fae77f4142380180, type: 3}
+  overBakePrefab: {fileID: 3015303501366533203, guid: e519b04473a45734b8762ff912de5662, type: 3}
   scoreSystem: {fileID: 1522151681}
   skilletAction:
     m_Name: Skillet
