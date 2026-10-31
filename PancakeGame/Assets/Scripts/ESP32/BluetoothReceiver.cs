@@ -22,20 +22,25 @@ public class BluetoothReceiver : MonoBehaviour
 
     //入力データ数値の閾値の為のScriptableObject
     [SerializeField] private ControllerSettings _controllerSettings;
+    [SerializeField] private string portName = "COM7";
 
     void Start()
     {
         parser = new ESP32ControllerParser(_controllerSettings);
+        Debug.Log("利用可能なポート: " + string.Join(", ", SerialPort.GetPortNames()));
 
         try
         {
-            bluetooth = new SerialPort("COM7", 115200);
+            bluetooth = new SerialPort(portName, 115200);
+            bluetooth.ReadTimeout = 100;
+            bluetooth.DtrEnable = true;   // 動かない場合は false / RtsEnable との組み合わせを試す
+            bluetooth.RtsEnable = false;
             bluetooth.Open();
             Debug.Log("COM7 ポートを正常に開きました");
         }
         catch (Exception ex)
         {
-            Debug.LogError($"ポートオープンエラー: {ex.Message}");
+            Debug.LogError($"ポートオープンエラー({portName}): {ex.GetType().Name} {ex.Message}");
             return;
         }
 
