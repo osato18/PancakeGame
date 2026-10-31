@@ -47,8 +47,15 @@ public class system_event : MonoBehaviour
     {
 
         cautionObj[stoveNum].SetActive(true);
+        //警告音再生
+        AudioManager.PlaySE("Nearfire");
         yield return new WaitForSeconds(waitSpan);
         cautionObj[stoveNum].SetActive(false);
+         //通常火false
+        normalfireObjs[stoveNum].SetActive(false);
+        //燃えているSE再生
+        AudioManager.PlaySE("Nowfire");
+        
         nextAction?.Invoke();
     }
 
@@ -59,9 +66,9 @@ public class system_event : MonoBehaviour
         {
             int r = UnityEngine.Random.Range(0, 1000) % 3;
             stoveNum = r;
-            //通常火false
-            normalfireObjs[stoveNum].SetActive(false);
+           
             StartCoroutine(EventFireCaution(stoveNum, 1.0f, () => fireObjs[stoveNum].SetActive(true)));
+            
         }
         else
         {

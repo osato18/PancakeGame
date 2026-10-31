@@ -185,6 +185,8 @@ public class system_playerDevice : MonoBehaviour
         if (!pancake.flying)
         {
             skillet.pancake.flying = true;
+            //ジャンプ時の効果音再生
+            AudioManager.PlaySE("Flypancake");
 
             Debug.Log("GameJump");
             float f_Vel = pancake.topPos / pancake.jumpTime + GRAVITY * pancake.jumpTime / 2;
@@ -232,6 +234,7 @@ public class system_playerDevice : MonoBehaviour
             if (spanTimer >= 5f)
             {
                 scoreSystem.AddScore(-50);
+                
                 spanTimer = 0f;
             }
         }
@@ -248,7 +251,7 @@ public class system_playerDevice : MonoBehaviour
         ReplaceDecoration(0, 0, overBakePrefab);
         //ここ絶対に後で直す
         yield return new WaitForSeconds(waitSpan);
-        
+
         pancake.overBake = false;
         pancake.bakingScore = 0f;
         
@@ -262,6 +265,7 @@ public class system_playerDevice : MonoBehaviour
         if (pancake.bakingScore >= p_overbakingScore && !pancake.overBake)
         {
             pancake.overBake = true;
+            
         }
         if (pancake.overBake)
         {
@@ -435,6 +439,8 @@ public class system_playerDevice : MonoBehaviour
         GameObject newObj = Instantiate(prefab, marker.position, marker.rotation, marker);
         //こげエフェクト生成
         EffectManager.PlayEffect("PancakeBurn_Smoke",marker.position);
+        //パンケーキこげたときの音再生
+        AudioManager.PlaySE("Burned");
 
         if(typeNum == 1)
         {

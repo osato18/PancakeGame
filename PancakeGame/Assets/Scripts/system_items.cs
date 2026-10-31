@@ -55,8 +55,21 @@ public class system_items : MonoBehaviour
         if (other.Equals(p_col))
         {
             Scoring(ref item);
+            
             Vector3 pos=this.transform.position;
-           EffectManager.PlayEffect("ItemGetEffect_Sphere005_Particle_Glow",pos);
+            //バフエフェクト生成と効果音再生
+            if (item.type.Equals(ItemsType.good))
+            {
+                EffectManager.PlayEffect("ItemGetEffect_Sphere005_Particle_Glow",pos);
+                AudioManager.PlaySE("BuffGet");
+            }
+            //デバフ時のパーティクル生成と効果音再生
+            else if (item.type.Equals(ItemsType.bad))
+            {
+                EffectManager.PlayEffect("ItemGetEffect_Sphere005_Particle_Glow",pos);
+                AudioManager.PlaySE("Debuffitem");
+            }
+           
             Destroy(gameObject);
         }
     }
