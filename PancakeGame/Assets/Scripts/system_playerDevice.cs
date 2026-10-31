@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
@@ -16,6 +17,7 @@ public class system_playerDevice : MonoBehaviour
     [SerializeField] private GameObject[] visualPrefab;
     [SerializeField] private GameObject[] placePrefab;
     [SerializeField] private GameObject[] topPlacePrefab;
+    [SerializeField] private GameObject overBakePrefab;
     private Skillet skillet;
 
     [SerializeField] private system_scores scoreSystem;
@@ -123,9 +125,7 @@ public class system_playerDevice : MonoBehaviour
         skillet.pancake.topPos = p_topPos;
         skillet.pancake.surface = 0;
         skillet.pancake.bakingSpeed = p_bakingSpeed;
-        skillet.pancake.overBake = new bool[2];
-        skillet.pancake.overBake[0] = false;
-        skillet.pancake.overBake[1] = false;
+        skillet.pancake.overBake = false;
 
         //UIManager.UpdateBakeUI(skillet.pancake.bakingScore);
     }
@@ -225,7 +225,7 @@ public class system_playerDevice : MonoBehaviour
     void OverBakeDemerit()
     {
 
-        if (skillet.pancake.overBake[skillet.pancake.surface])
+        if (skillet.pancake.overBake)
         {
             spanTimer += Time.deltaTime;
             if (spanTimer >= 5f)
@@ -241,21 +241,30 @@ public class system_playerDevice : MonoBehaviour
 
     }
 
+    IEnumerator overBakePan(float waitSpan, Action nextAction, Pancake pancake)
+    {
+        ReplaceDecoration(0, 0, overBakePrefab);
+        yield return new WaitForSeconds(waitSpan);
+        pancake.overBake = false;
+        pancake.bakingScore = 0f;
+
+        nextAction?.Invoke();
+    }
+
 
     void OverBakingCheck(ref Pancake pancake)
     {
-        if (pancake.bakingScore >= p_overbakingScore && !pancake.overBake[pancake.surface])
+        if (pancake.bakingScore >= p_overbakingScore && !pancake.overBake)
         {
-            pancake.overBake[pancake.surface] = true;
+            pancake.overBake = true;
         }
-        if (pancake.overBake[0] && pancake.overBake[1])
+        if (pancake.overBake)
         {
-            skillet.pancake.overBake[0] = false;
-            skillet.pancake.overBake[1] = false;
-            pancake.bakingScore = 0f;
-            DecorationDelete();
+            StartCoroutine(overBakePan(0.5f, () => DecorationDelete(), pancake));
         }
     }
+
+
 
     float bakingTimer = 0f;
     void BakingScoring(ref Skillet skillet, ref Pancake pancake)
@@ -265,7 +274,7 @@ public class system_playerDevice : MonoBehaviour
             return;
         }
         pancake.bakingScore += bakingCoe[skillet.stoveNowNum] * pancake.bakingSpeed * Time.deltaTime;
-        if (pancake.overBake[pancake.surface])
+        if (pancake.overBake)
         {
             pancake.bakingScore = 0f;
         }
@@ -394,15 +403,22 @@ public class system_playerDevice : MonoBehaviour
 
             // The previous top level is now covered by the new pancake.
             int previousTopIndex = index - 1;
-            if (previousTopIndex >= 0 && stay_visualObjs[1, previousTopIndex] != null)
+            for(int i = 0; i < stay_visualObjs.GetLength(0); i++)
             {
-                ReplaceStrawberry(previousTopIndex, placePrefab[1]);
+                if (previousTopIndex >= 0 && stay_visualObjs[i, previousTopIndex] != null)
+                {
+                    foreach(int objTypeNum in slots[previousTopIndex].objTypeNums)
+                    {
+                        ReplaceDecoration(previousTopIndex, objTypeNum, placePrefab[objTypeNum]);   
+                    }
+                }
             }
         }
     }
-    void ReplaceStrawberry(int index, GameObject prefab)
+
+    void ReplaceDecoration(int index, int  typeNum, GameObject prefab)
     {
-        GameObject oldObj = stay_visualObjs[1, index];
+        GameObject oldObj = stay_visualObjs[typeNum, index];
         if (oldObj == null) return;
         if (prefab == null)
         {
@@ -413,10 +429,18 @@ public class system_playerDevice : MonoBehaviour
         Transform marker = skillet.pancake.visualObjs[index].obj.transform;
         GameObject newObj = Instantiate(prefab, marker.position, marker.rotation, marker);
 
+        if(typeNum == 1)
+        {
+            Vector3 temp = newObj.transform.localPosition;
+            temp.y -= 0.55f;
+            newObj.transform.localPosition = temp;
+        }
+
+
         // Destroy is deferred, so hide the old appearance immediately.
         oldObj.SetActive(false);
         Destroy(oldObj);
-        stay_visualObjs[1, index] = newObj;
+        stay_visualObjs[typeNum, index] = newObj;
         newObj.SetActive(true);
     }
 
@@ -460,6 +484,7 @@ public class system_playerDevice : MonoBehaviour
             slots[visualObjNum].objTypeNums.Clear();
             slots[visualObjNum].is_base = false;
             visualObjNum--;
+            if(visualObjNum < 0) system_Scene.EventSceneManager("Result");
         }
         while (visualObjNum >= 0 && !slots[0].is_base);
         
@@ -514,7 +539,7 @@ public struct Pancake
     public Rigidbody rb;
     public float bakingScore;
     public float bakingSpeed;
-    public bool[] overBake;
+    public bool overBake;
     public float jumpTime;
     public float topPos;
     public bool flying;
