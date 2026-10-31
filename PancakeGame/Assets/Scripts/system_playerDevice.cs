@@ -44,6 +44,8 @@ public class system_playerDevice : MonoBehaviour
 
     private List<GameObject> add_visualObjs = new List<GameObject>();
 
+    private bool[] addFlag = new bool[3];
+
     public event Action JumpSucceeded;
     public event Action<int> LaneArrived;
     public event Action<int> DecorationPlaced;
@@ -115,6 +117,10 @@ public class system_playerDevice : MonoBehaviour
 
     void SkilletInit(ref Skillet skillet, Rigidbody pancakeBody)
     {
+        for(int i = 0; i < addFlag.Length; i++)
+        {
+            addFlag[i] = false;
+        }
         skillet.obj = skilletObj;
         skillet.linesObj = linesObj;
         skillet.pancake.obj = pancakeObj;
@@ -161,6 +167,14 @@ public class system_playerDevice : MonoBehaviour
         VirtualPancake(add_visualObjs);
     }
 
+    void LocalPosRivise(Transform retransform, float moveDis)
+    {
+        Vector3 temp = retransform.transform.localPosition;
+        temp.y += moveDis;
+        retransform.transform.localPosition = temp;
+
+    }
+
     void SkilletControl(ref Skillet skillet, int moveInt)
     {
         if (system_tutorial.IsRunning && !TutorialControlsEnabled) return;
@@ -200,19 +214,32 @@ public class system_playerDevice : MonoBehaviour
         }
     }
 
+    void ResetBakingScore(ref Pancake pancake)
+    {
+        pancake.bakingScore -= p_bakingResetScore;
+        if (pancake.bakingScore < 0f)
+        {
+            pancake.bakingScore = 0f;
+        }
+        scoreSystem.SetFireScore(pancake.bakingScore);
+        UIManager.UpdateBakeUI(pancake.bakingScore);
+    }
+
+
     void PancakeMove(ref Pancake pancake)
     {
         if (system_tutorial.IsRunning && (!TutorialControlsEnabled || !TutorialJumpAllowed)) return;
         if (!pancake.flying)
         {
+            ResetBakingScore(ref pancake);
             skillet.pancake.flying = true;
+
             lastJumpPhysicsTime = Time.fixedTime;
 
             Debug.Log("GameJump");
             float f_Vel = pancake.topPos / pancake.jumpTime + GRAVITY * pancake.jumpTime / 2;
             pancake.rb.AddForce(new Vector3(0.0f, f_Vel, 0.0f), ForceMode.VelocityChange);
 
-            ResetBakingScore(ref pancake);
             JumpSucceeded?.Invoke();
         }
     }
@@ -287,7 +314,10 @@ public class system_playerDevice : MonoBehaviour
         {
             return;
         }
-        pancake.bakingScore += bakingCoe[skillet.stoveNowNum] * pancake.bakingSpeed * Time.deltaTime;
+        if (!pancake.flying)
+        {
+            pancake.bakingScore += bakingCoe[skillet.stoveNowNum] * pancake.bakingSpeed * Time.deltaTime;
+        }
         if (pancake.overBake)
         {
             pancake.bakingScore = 0f;
@@ -306,15 +336,6 @@ public class system_playerDevice : MonoBehaviour
         OverBakingCheck(ref pancake);
     }
 
-    void ResetBakingScore(ref Pancake pancake)
-    {
-        pancake.bakingScore -= p_bakingResetScore;
-        if (pancake.bakingScore < 0f)
-        {
-            pancake.bakingScore = 0f;
-        }
-        scoreSystem.SetFireScore(pancake.bakingScore);
-    }
 
     public void BakingSpeedChange(float coe, int stoveNum)
     {
@@ -324,12 +345,15 @@ public class system_playerDevice : MonoBehaviour
     // visualObjNum is the number of occupied pancake levels.
     bool TryGetDecorationIndex(int typeNum, out int index)
     {
-        index = typeNum == 0 ? visualObjNum + 1 : visualObjNum;
         if(visualObjNum <= 0)
         {
             visualObjNum = 0;
-            index = 0;
-        } 
+        }
+        else if(!skillet.pancake.visualObjs[visualObjNum - 1].is_base && typeNum != 0)
+        {
+            visualObjNum--;
+        }
+        index = visualObjNum;
         if (typeNum < 0 || typeNum >= stay_visualObjs.GetLength(0) ||
             index < 0 || index >= skillet.pancake.visualObjs.Length)
             return false;
@@ -365,7 +389,7 @@ public class system_playerDevice : MonoBehaviour
 
     public void DecorationAdd(int addNum)
     {
-        if (!TryGetDecorationIndex(addNum, out _) || !ValidatePlacedDecoration(addNum)) return;
+        if (!TryGetDecorationIndex(addNum, out _) && !ValidatePlacedDecoration(addNum)) return;
         if (visualPrefab == null || addNum >= visualPrefab.Length || visualPrefab[addNum] == null)
         {
             Debug.LogError($"system_playerDevice: Visual Prefab[{addNum}] を設定してください。", this);
@@ -403,30 +427,35 @@ public class system_playerDevice : MonoBehaviour
 
         if(typeNum == 1)
         {
-            Vector3 temp = instance.transform.localPosition;
-            temp.y -= 0.55f;
-            instance.transform.localPosition = temp;
+            LocalPosRivise(instance.transform, -0.55f);
         }
 
         stay_visualObjs[typeNum, index] = instance;
         instance.SetActive(true);
         slots[index].objTypeNums.Add(typeNum);
         slots[index].is_base = slots[index].objTypeNums.Contains(0);
+        if (!addFlag[typeNum])
+        {
+            addFlag[typeNum] = true;
+        }
+        visualObjNum++;
         if (typeNum == 0)
         {
-            visualObjNum++;
-
+            for(int i = 0; i < addFlag.Length; i++)
+            {
+                addFlag[i] = false;
+            }
             // The previous top level is now covered by the new pancake.
             int previousTopIndex = index - 1;
             for(int i = 0; i < stay_visualObjs.GetLength(0); i++)
             {
-                if (previousTopIndex >= 0 && stay_visualObjs[i, previousTopIndex] != null)
-                {
-                    foreach(int objTypeNum in slots[previousTopIndex].objTypeNums)
-                    {
-                        ReplaceDecoration(previousTopIndex, objTypeNum, placePrefab[objTypeNum]);   
-                    }
-                }
+                // if (previousTopIndex >= 0 && stay_visualObjs[i, previousTopIndex] != null)
+                // {
+                //     foreach(int objTypeNum in slots[previousTopIndex].objTypeNums)
+                //     {
+                //         ReplaceDecoration(previousTopIndex, objTypeNum, placePrefab[objTypeNum]);   
+                //     }
+                // }
             }
         }
         DecorationPlaced?.Invoke(typeNum);
@@ -447,9 +476,7 @@ public class system_playerDevice : MonoBehaviour
 
         if(typeNum == 1)
         {
-            Vector3 temp = newObj.transform.localPosition;
-            temp.y -= 0.55f;
-            newObj.transform.localPosition = temp;
+            LocalPosRivise(newObj.transform, -0.55f);
         }
 
 
@@ -464,7 +491,6 @@ public class system_playerDevice : MonoBehaviour
     {
         VisualObj[] slots = skillet.pancake.visualObjs;
         if (visualObjNum <= 0) return;
-
         do
         {
             // Delete all placed decorations at the bottom, leaving the markers intact.
@@ -492,6 +518,10 @@ public class system_playerDevice : MonoBehaviour
                     Transform marker = slots[i].obj.transform;
                     instance.transform.SetParent(marker, true);
                     instance.transform.SetPositionAndRotation(marker.position, marker.rotation);
+                    if(type == 1)
+                    {
+                        LocalPosRivise(instance.transform, -0.55f);   
+                    }
                 }
                 slots[i].objTypeNums = new List<int>(slots[i + 1].objTypeNums);
                 slots[i].is_base = slots[i].objTypeNums.Contains(0);
@@ -502,6 +532,7 @@ public class system_playerDevice : MonoBehaviour
             visualObjNum = 0;
             for (int i = 0; i < slots.Length; i++)
                 if (stay_visualObjs[0, i] != null) visualObjNum++;
+            visualObjNum++;
         }
         while (visualObjNum > 0 && !slots[0].is_base);
         if (visualObjNum == 0 && !system_tutorial.IsRunning)
@@ -605,6 +636,11 @@ public class system_playerDevice : MonoBehaviour
                 return;
             }
         }
+    }
+
+    public bool AddFlagCheck(int typeNum)
+    {
+        return addFlag[typeNum];
     }
 }
 

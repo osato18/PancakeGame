@@ -6,6 +6,7 @@ public class system_itemsSpawner : MonoBehaviour
 {
     [SerializeField] private UIManager uiManager;
     [SerializeField] private system_scores scoresSystem;
+    [SerializeField] private system_playerDevice playerDeviceSys;
     [SerializeField] private GameObject[] itemObj;
     [SerializeField] private Transform[] spawnTrans = new Transform[2];
     [SerializeField] private Collider p_col;
@@ -38,6 +39,7 @@ public class system_itemsSpawner : MonoBehaviour
         item.p_col = p_col;
         item.scoresSystem = scoresSystem;
         item.uiManager = uiManager;
+        item.p_DeviceSys = playerDeviceSys;
         itemsSystem.RemoveAll(entry => entry == null);
         itemsSystem.Add(item);
         return item;
