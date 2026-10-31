@@ -133,5 +133,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::system_items
   scoresSystem: {fileID: 0}
   itemType: 0
+  addScore: 100
   p_col: {fileID: 0}
+  p_DeviceSys: {fileID: 0}
   speed: -5
+  uiManager: {fileID: 0}

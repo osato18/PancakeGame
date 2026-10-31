@@ -41,7 +41,9 @@ public class UIManager : MonoBehaviour
     private void Awake()
     {
         _instance = this;
-        UpdateItemUI(ItemsType.good, _currentItemNums[(int)ItemsType.good]);
+        UpdateItemUI(ItemsType.strawberry, _currentItemNums[(int)ItemsType.strawberry]);
+        UpdateItemUI(ItemsType.cream, _currentItemNums[(int)ItemsType.cream]);
+        UpdateItemUI(ItemsType.blueberry, _currentItemNums[(int)ItemsType.blueberry]);
     }
 
     private void Update()

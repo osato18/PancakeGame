@@ -112,11 +112,15 @@ public class system_event : MonoBehaviour
     void EventAddDeco()
     {   
         int[] nums = new int[2];
-        nums = UIManager.GetItemNums(ItemsType.good);
-        if(nums[0] >= nums[1])
+        for(int i = 0; i < 3; i++)
         {
-            UIManager.ResetItemUI(ItemsType.good);
-            playerDeviceSys.DecorationAdd((int)ItemsType.good + 1);
+            ItemsType type = ItemsType.strawberry + i;
+            nums = UIManager.GetItemNums(type);
+            if (nums[0] >= nums[1])
+            {
+                UIManager.ResetItemUI(type);
+                playerDeviceSys.DecorationAdd((int)type + 1);
+            }
         }
     }
     

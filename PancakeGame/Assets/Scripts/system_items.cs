@@ -6,6 +6,7 @@ public class system_items : MonoBehaviour
 {
     public system_scores scoresSystem;
     [SerializeField] private ItemsType itemType;
+    [SerializeField] private int addScore;
     public Collider p_col;
     private Items item;
 
@@ -59,18 +60,30 @@ public class system_items : MonoBehaviour
 
     void Scoring(ref Items items)
     {
-        if (items.type.Equals(ItemsType.good))
+        scoresSystem.AddScore(addScore);
+        if (items.type.Equals(ItemsType.strawberry))
         {
-            scoresSystem.AddScore(100);
             if(!p_DeviceSys.AddFlagCheck((int)(item.type) + 1))
             {
                 uiManager._currentItemNums[(int)items.type]++;
                 UIManager.UpdateItemUI(items.type, uiManager._currentItemNums[(int)items.type]);
             }
         }
-        else if (items.type.Equals(ItemsType.bad))
+        else if (items.type.Equals(ItemsType.cream))
         {
-            scoresSystem.AddScore(-100);
+            if(!p_DeviceSys.AddFlagCheck((int)(item.type) + 1))
+            {
+                uiManager._currentItemNums[(int)items.type]++;
+                UIManager.UpdateItemUI(items.type, uiManager._currentItemNums[(int)items.type]);
+            }
+        }
+        else if (items.type.Equals(ItemsType.blueberry))
+        {
+            if(!p_DeviceSys.AddFlagCheck((int)(item.type) + 1))
+            {
+                uiManager._currentItemNums[(int)items.type]++;
+                UIManager.UpdateItemUI(items.type, uiManager._currentItemNums[(int)items.type]);
+            }
         }
     } 
 
@@ -105,6 +118,8 @@ public struct Items
 
 public enum ItemsType
 {
-    good=0,
+    strawberry = 0,
+    cream = 1,
+    blueberry = 2,
     bad
 }

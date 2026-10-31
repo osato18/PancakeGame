@@ -66,7 +66,7 @@ public class system_tutorial : MonoBehaviour
         foreach (var spawner in spawners)
             if (spawner == null || !spawner.TutorialReady)
             { Fail("Spawnerの加算/減算Prefab、地上/空中の生成位置、プレイヤーColliderを設定してください。"); return; }
-        int[] gauge = UIManager.GetItemNums(ItemsType.good);
+        int[] gauge = UIManager.GetItemNums(ItemsType.strawberry);
         if (gauge[1] <= 0) { Fail("加算アイテムゲージの最大数を1以上に設定してください。"); return; }
         player.JumpSucceeded += OnJumpSucceeded;
         player.LaneArrived += OnLaneArrived;
@@ -191,20 +191,20 @@ public class system_tutorial : MonoBehaviour
             bool airborne = progress.GroundItems >= 2;
             tutorialExplainText.text = $"地上 {Mathf.Min(progress.GroundItems, 2)}/2　空中 {Mathf.Min(progress.AirItems, 2)}/2\n" +
                 (airborne ? "高いアイテムをジャンプして取ろう！" : "低いアイテムを地上で取ろう！");
-            yield return PracticeItem(ItemsType.good, airborne);
+            yield return PracticeItem(ItemsType.strawberry, airborne);
             if (failed) yield break;
         }
 
-        yield return ShowLesson("④ アイテムゲージ", "黄色い枠のゲージに注目！同じアイテムを集めて満タンにし、\nデコレーション層を完成させよう。", UIManager.ItemGaugeRect(ItemsType.good));
+        yield return ShowLesson("④ アイテムゲージ", "黄色い枠のゲージに注目！同じアイテムを集めて満タンにし、\nデコレーション層を完成させよう。", UIManager.ItemGaugeRect(ItemsType.strawberry));
         yield return FreshPancake();
         if (failed) yield break;
-        UIManager.ResetItemUI(ItemsType.good);
+        UIManager.ResetItemUI(ItemsType.strawberry);
         step = Step.Decoration;
-        while (UIManager.GetItemNums(ItemsType.good)[0] < UIManager.GetItemNums(ItemsType.good)[1])
+        while (UIManager.GetItemNums(ItemsType.strawberry)[0] < UIManager.GetItemNums(ItemsType.strawberry)[1])
         {
-            int[] gauge = UIManager.GetItemNums(ItemsType.good);
+            int[] gauge = UIManager.GetItemNums(ItemsType.strawberry);
             tutorialExplainText.text = $"アイテムゲージ：{gauge[0]} / {gauge[1]}";
-            yield return PracticeItem(ItemsType.good, false);
+            yield return PracticeItem(ItemsType.strawberry, false);
             if (failed) yield break;
         }
         tutorialExplainText.text = "ゲージ満タン！デコレーションが載るのを見よう。";
@@ -212,7 +212,7 @@ public class system_tutorial : MonoBehaviour
         player.DecorationAdd(1);
         yield return WaitForPlacement(beforeDecoration, 1);
         if (failed) yield break;
-        UIManager.ResetItemUI(ItemsType.good);
+        UIManager.ResetItemUI(ItemsType.strawberry);
 
         yield return ShowLesson("⑤ 減算アイテム", "減算アイテムを3個連続で避けよう。接触すると連続回数は0に戻ります。");
         progress.Reset();
