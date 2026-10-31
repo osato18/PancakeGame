@@ -40,11 +40,11 @@ public class system_playerDevice : MonoBehaviour
     private float[] bakingCoe = { 1.0f, 1.0f, 1.0f };
 
     private int visualObjNum;
-    private GameObject[,] stay_visualObjs = new GameObject[3, 5];
+    private GameObject[,] stay_visualObjs = new GameObject[4, 5];
 
     private List<GameObject> add_visualObjs = new List<GameObject>();
 
-    private bool[] addFlag = new bool[3];
+    private bool[] addFlag = new bool[4];
 
     public event Action JumpSucceeded;
     public event Action<int> LaneArrived;
@@ -160,6 +160,26 @@ public class system_playerDevice : MonoBehaviour
         SkilletMove(ref skillet);
         BakingScoring(ref skillet, ref skillet.pancake);
         OverBakeDemerit();
+
+        var keyboard = Keyboard.current;
+        if (keyboard == null) return;
+        if (keyboard.digit0Key.wasPressedThisFrame)
+        {
+            DecorationAdd(0);
+        }
+        if (keyboard.digit1Key.wasPressedThisFrame)
+        {
+            DecorationAdd(1);
+        }
+
+        if (keyboard.digit2Key.wasPressedThisFrame)
+        {
+            DecorationAdd(2);
+        }
+        if (keyboard.digit3Key.wasPressedThisFrame)
+        {
+            DecorationAdd(3);
+        }
     }
 
     void FixedUpdate()
@@ -287,8 +307,8 @@ public class system_playerDevice : MonoBehaviour
         if (overBakePrefab != null) ReplaceDecoration(0, 0, overBakePrefab);
         yield return new WaitForSeconds(waitSpan);
         DecorationDelete();
+        yield return new WaitForSeconds(0.1f);
         ResetTutorialBake();
-        skillet.pancake.overBake = false;
         burnRoutine = null;
         BurnFinished?.Invoke();
     }
@@ -427,7 +447,15 @@ public class system_playerDevice : MonoBehaviour
 
         if(typeNum == 1)
         {
-            LocalPosRivise(instance.transform, -0.55f);
+            LocalPosRivise(instance.transform, -0.11f);
+        }
+        else if(typeNum == 2)
+        {
+            LocalPosRivise(instance.transform, -0.322f);
+        }
+        else if(typeNum == 3)
+        {
+            LocalPosRivise(instance.transform, -0.93f);
         }
 
         stay_visualObjs[typeNum, index] = instance;
@@ -476,9 +504,16 @@ public class system_playerDevice : MonoBehaviour
 
         if(typeNum == 1)
         {
-            LocalPosRivise(newObj.transform, -0.55f);
+            LocalPosRivise(newObj.transform, -0.11f);
         }
-
+        else if(typeNum == 2)
+        {
+            LocalPosRivise(newObj.transform, -0.322f);
+        }
+        else if(typeNum == 3)
+        {
+            LocalPosRivise(newObj.transform, -0.93f);
+        }
 
         // Destroy is deferred, so hide the old appearance immediately.
         oldObj.SetActive(false);
@@ -520,7 +555,15 @@ public class system_playerDevice : MonoBehaviour
                     instance.transform.SetPositionAndRotation(marker.position, marker.rotation);
                     if(type == 1)
                     {
-                        LocalPosRivise(instance.transform, -0.55f);   
+                        LocalPosRivise(instance.transform, -0.11f);   
+                    }
+                    else if (type == 2)
+                    {
+                        LocalPosRivise(instance.transform, -0.322f);
+                    }
+                    else if (type == 3)
+                    {
+                        LocalPosRivise(instance.transform, -0.93f);
                     }
                 }
                 slots[i].objTypeNums = new List<int>(slots[i + 1].objTypeNums);
