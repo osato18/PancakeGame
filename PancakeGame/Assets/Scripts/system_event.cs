@@ -40,6 +40,7 @@ public class system_event : MonoBehaviour
             if (caution != null) caution.SetActive(false);
         TutorialFireLane = lane;
     }
+    [SerializeField] private float bigFireSpeedCoe;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
