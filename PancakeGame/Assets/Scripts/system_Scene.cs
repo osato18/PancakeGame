@@ -3,6 +3,10 @@ using UnityEngine.SceneManagement;
 
 public class system_Scene : MonoBehaviour
 {
+    public void OpenTutorial()
+    {
+        SceneManager.LoadScene("Tutorial");
+    }
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {

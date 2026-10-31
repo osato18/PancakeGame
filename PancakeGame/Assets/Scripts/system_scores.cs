@@ -5,9 +5,8 @@ using UnityEngine.UI;
 
 public class system_scores : MonoBehaviour
 {
+    public event System.Action ScoreChanged;
     [SerializeField] private TextMeshProUGUI scoreTxt;
-    //[SerializeField] private TextMeshProUGUI fireScoreTxt;
-    //[SerializeField] private Slider bakingSlider;
     [SerializeField] private TextMeshProUGUI timerText;
     private int score = 0;
     private float bakingScore = 0.0f;
@@ -17,59 +16,88 @@ public class system_scores : MonoBehaviour
     [Header("時間制限[s]")]
     [SerializeField] private float maxTime;
 
+    // タイマー終了時に一度だけ遷移処理を呼ぶためのフラグ
+    private bool isTimesUp = false;
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
 
     }
 
-    // Update is called once per frame
     void Update()
     {
+        if (system_tutorial.IsRunning) return;
         Timer();
     }
 
     public void SetScore(int setScore)
     {
+        bool changed = setScore != score;
         score = setScore;
         UIManager.UpdateScoreUI(score);
-        //scoreTxt.text = "Score: " + score.ToString();
+        if (changed) ScoreChanged?.Invoke();
     }
 
     public void AddScore(int addScore)
     {
         score += addScore;
         UIManager.UpdateScoreUI(score);
-        //scoreTxt.text = "Score: " + score.ToString();
+        if (addScore != 0) ScoreChanged?.Invoke();
     }
 
     public void SetFireScore(float setFireScore)
     {
         bakingScore = setFireScore;
-        //fireScoreTxt.text = "Baking Score: " + bakingScore.ToString("F2");
-        //bakingSlider.value = bakingScore;
     }
 
     public void AddFireScore(float addFireScore)
     {
         bakingScore += addFireScore;
-        //fireScoreTxt.text = "Baking Score: " + bakingScore.ToString("F2");
-        //bakingSlider.value = bakingScore;
     }
 
     void Timer()
     {
-        //イベント用経過時間計算
-        timer += Time.deltaTime;
-        //timerText.text = "Time: " + timer.ToString("F1");
+        // すでにタイムアップしていれば何もしない
+        if (isTimesUp) return;
 
-        //カウントダウンタイマー用
+        // イベント用経過時間計算
+        timer += Time.deltaTime;
+
+        // カウントダウンタイマー用
         if (maxTime > 0f)
         {
             maxTime -= Time.deltaTime;
-            maxTime = Mathf.Max(maxTime, 0f);
+            
+            // タイマーが 0 以下になった瞬間
+            if (maxTime <= 0f)
+            {
+                maxTime = 0f;
+                isTimesUp = true;
+                TimesUpAction(); // タイムアップ時の処理を実行
+            }
         }
         UIManager.UpdateTimerUI(maxTime);
+    }
+
+    // ★ タイムアップ時にデータ保存とシーン遷移を行うメソッド
+    void TimesUpAction()
+    {
+        Debug.Log("タイムアップ！リザルトへ移行します。");
+
+        GameDataHolder.SavedScore = score;
+
+        // シーン内から system_playerDevice を取得してデータを保存する
+        system_playerDevice playerDevice = FindAnyObjectByType<system_playerDevice>();
+        if (playerDevice != null)
+        {
+            playerDevice.SaveDataForScoreCalculation();
+        }
+        else
+        {
+            Debug.LogWarning("system_playerDevice が見つかりませんでした。データが保存されません。");
+        }
+
+        // Resultシーンへ遷移
+        system_Scene.EventSceneManager("Result");
     }
 }

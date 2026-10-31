@@ -15,6 +15,33 @@ public class system_event : MonoBehaviour
     [SerializeField] private GameObject[] fireObjs = new GameObject[3];
     [SerializeField] private GameObject scoreBoard;
     [SerializeField] private GameObject[] cautionObj = new GameObject[3];
+    public bool TutorialReady => fireObjs != null && fireObjs.Length >= 3 &&
+        fireObjs[0] != null && fireObjs[1] != null && fireObjs[2] != null &&
+        cautionObj != null && cautionObj.Length >= 3 &&
+        cautionObj[0] != null && cautionObj[1] != null && cautionObj[2] != null;
+    public int TutorialFireLane { get; private set; } = -1;
+    public bool TutorialFireActive => TutorialFireLane >= 0 && fireObjs[TutorialFireLane].activeInHierarchy;
+
+    public void ShowTutorialFireWarning(int lane)
+    {
+        SetTutorialFire(-1);
+        if (lane >= 0 && lane < cautionObj.Length && cautionObj[lane] != null)
+            cautionObj[lane].SetActive(true);
+    }
+
+    public void SetTutorialFire(int lane)
+    {
+        StopAllCoroutines();
+        for (int i = 0; i < fireObjs.Length; i++)
+        {
+            fireObjs[i].SetActive(i == lane);
+            playerDeviceSys.BakingSpeedChange(i == lane ? 10f : 1f, i);
+        }
+        foreach (GameObject caution in cautionObj)
+            if (caution != null) caution.SetActive(false);
+        TutorialFireLane = lane;
+    }
+    [SerializeField] private float bigFireSpeedCoe;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -40,6 +67,7 @@ public class system_event : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (system_tutorial.IsRunning) return;
         EventManager();
     }
 
@@ -100,11 +128,15 @@ public class system_event : MonoBehaviour
     void EventAddDeco()
     {   
         int[] nums = new int[2];
-        nums = UIManager.GetItemNums(ItemsType.good);
-        if(nums[0] >= nums[1])
+        for(int i = 0; i < 3; i++)
         {
-            UIManager.ResetItemUI(ItemsType.good);
-            playerDeviceSys.DecorationAdd((int)ItemsType.good + 1);
+            ItemsType type = ItemsType.strawberry + i;
+            nums = UIManager.GetItemNums(type);
+            if (nums[0] >= nums[1])
+            {
+                UIManager.ResetItemUI(type);
+                playerDeviceSys.DecorationAdd((int)type + 1);
+            }
         }
     }
     
@@ -115,7 +147,7 @@ public class system_event : MonoBehaviour
 
         if ((int)(scoresSys.timer / 10) % 3 == 2 && !eventFlag[0])
         {
-            EventBigFire(10.0f, eventFlag[0]);
+            EventBigFire(bigFireSpeedCoe, eventFlag[0]);
             eventFlag[0] = true;
         }
         else if ((int)(scoresSys.timer / 10) % 3 != 2 && eventFlag[0])

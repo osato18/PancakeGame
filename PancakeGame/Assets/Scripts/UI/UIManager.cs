@@ -26,13 +26,24 @@ public class UIManager : MonoBehaviour
     [SerializeField] private int[] _itemMaxNums;
     private static UIManager _instance;
 
+    public static RectTransform ItemGaugeRect(ItemsType type) =>
+        _instance != null && _instance._itemGauges != null && (int)type >= 0 &&
+        (int)type < _instance._itemGauges.Length && _instance._itemGauges[(int)type] != null
+            ? _instance._itemGauges[(int)type].rectTransform : null;
+    public static RectTransform BakeGaugeRect =>
+        _instance != null && _instance._bakeGauge != null ? _instance._bakeGauge.rectTransform : null;
+    public static RectTransform ScoreRect =>
+        _instance != null && _instance._scoreText != null ? _instance._scoreText.rectTransform : null;
+
     //
     public int[] _currentItemNums;
 
     private void Awake()
     {
         _instance = this;
-        UpdateItemUI(ItemsType.good, _currentItemNums[(int)ItemsType.good]);
+        UpdateItemUI(ItemsType.strawberry, _currentItemNums[(int)ItemsType.strawberry]);
+        UpdateItemUI(ItemsType.cream, _currentItemNums[(int)ItemsType.cream]);
+        UpdateItemUI(ItemsType.blueberry, _currentItemNums[(int)ItemsType.blueberry]);
     }
 
     private void Update()
