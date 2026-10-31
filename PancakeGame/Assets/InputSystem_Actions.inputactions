@@ -509,7 +509,7 @@
                     "expectedControlType": "Vector2",
                     "processors": "",
                     "interactions": "",
-                    "initialStateCheck": false
+                    "initialStateCheck": true
                 },
                 {
                     "name": "Submit",
@@ -588,6 +588,15 @@
                     "type": "PassThrough",
                     "id": "9caa3d8a-6b2f-4e8e-8bad-6ede561bd9be",
                     "expectedControlType": "Quaternion",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Move",
+                    "type": "PassThrough",
+                    "id": "18ca6b9e-ae6a-43fc-8f1a-7c646684059f",
+                    "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
@@ -959,6 +968,17 @@
                 },
                 {
                     "name": "",
+                    "id": "bce676b0-cea0-4b53-aa5b-c478f059e45e",
+                    "path": "<ESP32Controller>/buttonA",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";ESP32Controller",
+                    "action": "Click",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
                     "id": "38c99815-14ea-4617-8627-164d27641299",
                     "path": "<Mouse>/scroll",
                     "interactions": "",
@@ -1009,6 +1029,17 @@
                     "processors": "",
                     "groups": "XR",
                     "action": "TrackedDeviceOrientation",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "94f7a1cd-2779-44b8-8f89-49f307e38394",
+                    "path": "<ESP32Controller>/move",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";ESP32Controller",
+                    "action": "Move",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

@@ -1,48 +1,83 @@
+
 using UnityEngine;
-using UnityEngine.EventSystems;
+using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 public class UICursorManager : MonoBehaviour
 {
-    [Tooltip("追従させたいカーソルUIのRectTransform")]
-    [SerializeField] private RectTransform cursorRectTransform;
+    [Header("UI Buttons")]
+    [SerializeField] private Button[] buttons;
 
-    [Tooltip("ボタンの中心からのオフセット（必要に応じて微調整用）")]
-    [SerializeField] private Vector2 offset = Vector2.zero;
+    // 現在選択しているボタンの番号
+    private int _currentIndex = 1;
 
-    private void Update()
+    /// <summary>
+    /// Move入力
+    /// 0：左、1：中央、2：右
+    /// </summary>
+    public void OnMove(InputValue value)
     {
-        // 現在EventSystemで選択されているゲームオブジェクトを取得
-        GameObject currentSelected = EventSystem.current.currentSelectedGameObject;
+        int input = (int)value.Get<int>();
+        if (input < 0 || input > 2)
+            return;
 
-        if (currentSelected != null)
-        {
-            // 選択されたオブジェクトがUI要素（Selectable）を持っているか確認
-            Selectable selectable = currentSelected.GetComponent<Selectable>();
-            if (selectable != null)
-            {
-                RectTransform targetRect = currentSelected.GetComponent<RectTransform>();
-                if (targetRect != null && cursorRectTransform != null)
-                {
-                    // ワールド座標ベースでカーソルの位置を選択されたボタンの位置に合わせる
-                    Vector3 targetPosition = targetRect.position;
-                    cursorRectTransform.position = targetPosition + (Vector3)offset;
+        _currentIndex = input;
 
-                    // カーソルが非表示になっていれば表示する
-                    if (!cursorRectTransform.gameObject.activeSelf)
-                    {
-                        cursorRectTransform.gameObject.SetActive(true);
-                    }
-                }
-            }
-        }
-        else
+        UpdateSelection();
+    }
+
+    /// <summary>
+    /// Jump入力
+    /// 選択中のボタンのOnClickを実行
+    /// </summary>
+    public void OnJump(InputValue value)
+    {
+        if (!value.isPressed)
+            return;
+
+        if (buttons == null || buttons.Length != 3)
+            return;
+
+        if (buttons[_currentIndex] == null)
+            return;
+
+        buttons[_currentIndex].onClick.Invoke();
+    
+    }
+
+    /// <summary>
+    /// 選択状態の更新
+    /// </summary>
+    private void UpdateSelection()
+    {
+        for (int i = 0; i < buttons.Length; i++)
         {
-            // 何も選択されていない場合はカーソルを非表示にする（必要に応じて）
-            if (cursorRectTransform != null && cursorRectTransform.gameObject.activeSelf)
-            {
-                cursorRectTransform.gameObject.SetActive(false);
-            }
+            if (buttons[i] == null)
+                continue;
+
+            // 選択中のボタンを強調表示
+            ColorBlock colors = buttons[i].colors;
+
+            colors.normalColor = (i == _currentIndex)
+                ? Color.red
+                : Color.white;
+
+            buttons[i].colors = colors;
         }
+    }
+
+    private void StartButtonClick()
+    {
+        Debug.Log("スタート！");
+    }
+
+    private void TutorialButtonClick()
+    {
+        Debug.Log("チュートリアル");
+    }
+
+    private void CreditButtonClick()
+    {
+        Debug.Log("クレジット");
     }
 }
