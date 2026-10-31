@@ -4148,6 +4148,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::system_itemsSpawner
   uiManager: {fileID: 1522151683}
   scoresSystem: {fileID: 1522151681}
+  playerDeviceSys: {fileID: 278274606}
   itemObj:
   - {fileID: 3104304538766542927, guid: 8eed3d6fe80abca47b7b2918d484a3b7, type: 3}
   - {fileID: 4363590900084041235, guid: 925b5193512b6e14e94086e355517bf5, type: 3}
@@ -6379,6 +6380,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BluetoothReceiver
   _controllerSettings: {fileID: 11400000, guid: bd9099b5f25e4bc43954b4f5768f9818, type: 2}
+  portName: COM7
 --- !u!114 &937008615
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7476,6 +7478,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::system_itemsSpawner
   uiManager: {fileID: 1522151683}
   scoresSystem: {fileID: 1522151681}
+  playerDeviceSys: {fileID: 278274606}
   itemObj:
   - {fileID: 3104304538766542927, guid: 8eed3d6fe80abca47b7b2918d484a3b7, type: 3}
   - {fileID: 4363590900084041235, guid: 925b5193512b6e14e94086e355517bf5, type: 3}
@@ -12147,6 +12150,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::system_itemsSpawner
   uiManager: {fileID: 1522151683}
   scoresSystem: {fileID: 1522151681}
+  playerDeviceSys: {fileID: 278274606}
   itemObj:
   - {fileID: 3104304538766542927, guid: 8eed3d6fe80abca47b7b2918d484a3b7, type: 3}
   - {fileID: 4363590900084041235, guid: 925b5193512b6e14e94086e355517bf5, type: 3}
@@ -12783,6 +12787,7 @@ MonoBehaviour:
   - {fileID: 482172484}
   - {fileID: 2122114837}
   - {fileID: 1614049801}
+  bigFireSpeedCoe: 0
 --- !u!1001 &1807117514
 PrefabInstance:
   m_ObjectHideFlags: 0
