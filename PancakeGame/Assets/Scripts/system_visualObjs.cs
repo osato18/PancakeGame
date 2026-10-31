@@ -21,7 +21,7 @@ public class system_visualObjs : MonoBehaviour
 
     void OnCollisionEnter(Collision collision)
     {
-        if (activated ||
+        if (!isActiveAndEnabled || _PlayerDevice == null || activated ||
         collision.gameObject.layer == LayerMask.NameToLayer("item"))
         {
             return;

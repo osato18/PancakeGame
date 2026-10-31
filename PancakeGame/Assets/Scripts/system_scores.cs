@@ -5,6 +5,7 @@ using UnityEngine.UI;
 
 public class system_scores : MonoBehaviour
 {
+    public event System.Action ScoreChanged;
     [SerializeField] private TextMeshProUGUI scoreTxt;
     //[SerializeField] private TextMeshProUGUI fireScoreTxt;
     //[SerializeField] private Slider bakingSlider;
@@ -27,13 +28,16 @@ public class system_scores : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (system_tutorial.IsRunning) return;
         Timer();
     }
 
     public void SetScore(int setScore)
     {
+        bool changed = setScore != score;
         score = setScore;
         UIManager.UpdateScoreUI(score);
+        if (changed) ScoreChanged?.Invoke();
         //scoreTxt.text = "Score: " + score.ToString();
     }
 
@@ -41,6 +45,7 @@ public class system_scores : MonoBehaviour
     {
         score += addScore;
         UIManager.UpdateScoreUI(score);
+        if (addScore != 0) ScoreChanged?.Invoke();
         //scoreTxt.text = "Score: " + score.ToString();
     }
 

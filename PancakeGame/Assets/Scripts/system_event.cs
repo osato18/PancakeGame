@@ -14,6 +14,32 @@ public class system_event : MonoBehaviour
     [SerializeField] private GameObject[] fireObjs = new GameObject[3];
     [SerializeField] private GameObject scoreBoard;
     [SerializeField] private GameObject[] cautionObj = new GameObject[3];
+    public bool TutorialReady => fireObjs != null && fireObjs.Length >= 3 &&
+        fireObjs[0] != null && fireObjs[1] != null && fireObjs[2] != null &&
+        cautionObj != null && cautionObj.Length >= 3 &&
+        cautionObj[0] != null && cautionObj[1] != null && cautionObj[2] != null;
+    public int TutorialFireLane { get; private set; } = -1;
+    public bool TutorialFireActive => TutorialFireLane >= 0 && fireObjs[TutorialFireLane].activeInHierarchy;
+
+    public void ShowTutorialFireWarning(int lane)
+    {
+        SetTutorialFire(-1);
+        if (lane >= 0 && lane < cautionObj.Length && cautionObj[lane] != null)
+            cautionObj[lane].SetActive(true);
+    }
+
+    public void SetTutorialFire(int lane)
+    {
+        StopAllCoroutines();
+        for (int i = 0; i < fireObjs.Length; i++)
+        {
+            fireObjs[i].SetActive(i == lane);
+            playerDeviceSys.BakingSpeedChange(i == lane ? 10f : 1f, i);
+        }
+        foreach (GameObject caution in cautionObj)
+            if (caution != null) caution.SetActive(false);
+        TutorialFireLane = lane;
+    }
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -37,6 +63,7 @@ public class system_event : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (system_tutorial.IsRunning) return;
         EventManager();
     }
 

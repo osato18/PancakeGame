@@ -44,6 +44,24 @@ public class system_playerDevice : MonoBehaviour
 
     private List<GameObject> add_visualObjs = new List<GameObject>();
 
+    public event Action JumpSucceeded;
+    public event Action<int> LaneArrived;
+    public event Action<int> DecorationPlaced;
+    public event Action BurnStarted;
+    public event Action BurnFinished;
+    public bool TutorialControlsEnabled { get; set; } = true;
+    public bool TutorialJumpAllowed { get; set; } = true;
+    public bool TutorialBakingEnabled { get; set; }
+    public bool IsFlying => skillet.pancake.flying;
+    public bool IsBurning => skillet.pancake.overBake;
+    public int CurrentLane => skillet.stoveNowNum;
+    public float PlayerX => skilletObj.transform.position.x;
+    public float LaneX(int lane) => linesObj[lane].transform.position.x;
+    public bool HasPancake => visualObjNum > 0;
+    public Collider PancakeCollider => skillet.pancake.col;
+    private Coroutine burnRoutine;
+    private float lastJumpPhysicsTime = float.NegativeInfinity;
+
     void Awake()
     {
         // Initialize the actual struct before input callbacks can run.
@@ -76,7 +94,7 @@ public class system_playerDevice : MonoBehaviour
     {
         // 登録
         skilletAction.performed += OnMove;
-        //skilletAction.canceled += OnMoveCanceled;
+        skilletAction.canceled += OnTutorialMoveCanceled;
         pancakeAction.started += OnJump;
     }
     void OnDisable()
@@ -85,7 +103,7 @@ public class system_playerDevice : MonoBehaviour
         if (skilletAction != null)
         {
             skilletAction.performed -= OnMove;
-            //skilletAction.canceled -= OnMoveCanceled;
+            skilletAction.canceled -= OnTutorialMoveCanceled;
         }
         if (pancakeAction != null)
         {
@@ -119,7 +137,8 @@ public class system_playerDevice : MonoBehaviour
         visualObjNum = 0;
         DecorationAdd(0);
 
-        skillet.pancake.flying = false;
+        // Wait for actual contact with the pan before allowing the first jump.
+        skillet.pancake.flying = true;
         skillet.pancake.bakingScore = 0f;
         skillet.pancake.jumpTime = p_jumpTime;
         skillet.pancake.topPos = p_topPos;
@@ -144,6 +163,7 @@ public class system_playerDevice : MonoBehaviour
 
     void SkilletControl(ref Skillet skillet, int moveInt)
     {
+        if (system_tutorial.IsRunning && !TutorialControlsEnabled) return;
         if (moveInt == 0)   //左
         {
             skillet.stoveNextNum = 0;
@@ -175,31 +195,25 @@ public class system_playerDevice : MonoBehaviour
             {
                 skillet.stoveNowNum = skillet.stoveNextNum;
                 moveTime = 0.0f;
+                LaneArrived?.Invoke(skillet.stoveNowNum);
             }
         }
     }
 
     void PancakeMove(ref Pancake pancake)
     {
+        if (system_tutorial.IsRunning && (!TutorialControlsEnabled || !TutorialJumpAllowed)) return;
         if (!pancake.flying)
         {
             skillet.pancake.flying = true;
+            lastJumpPhysicsTime = Time.fixedTime;
 
             Debug.Log("GameJump");
             float f_Vel = pancake.topPos / pancake.jumpTime + GRAVITY * pancake.jumpTime / 2;
             pancake.rb.AddForce(new Vector3(0.0f, f_Vel, 0.0f), ForceMode.VelocityChange);
 
-            if (pancake.surface == 0)
-            {
-                ResetBakingScore(ref pancake);
-                pancake.surface = 1;
-            }
-            else if (pancake.surface == 1)
-            {
-                ResetBakingScore(ref pancake);
-                pancake.surface = 0;
-            }
-
+            ResetBakingScore(ref pancake);
+            JumpSucceeded?.Invoke();
         }
     }
 
@@ -241,14 +255,15 @@ public class system_playerDevice : MonoBehaviour
 
     }
 
-    IEnumerator overBakePan(float waitSpan, Action nextAction, Pancake pancake)
+    IEnumerator overBakePan(float waitSpan)
     {
-        ReplaceDecoration(0, 0, overBakePrefab);
+        if (overBakePrefab != null) ReplaceDecoration(0, 0, overBakePrefab);
         yield return new WaitForSeconds(waitSpan);
-        pancake.overBake = false;
-        pancake.bakingScore = 0f;
-
-        nextAction?.Invoke();
+        DecorationDelete();
+        ResetTutorialBake();
+        skillet.pancake.overBake = false;
+        burnRoutine = null;
+        BurnFinished?.Invoke();
     }
 
 
@@ -257,10 +272,8 @@ public class system_playerDevice : MonoBehaviour
         if (pancake.bakingScore >= p_overbakingScore && !pancake.overBake)
         {
             pancake.overBake = true;
-        }
-        if (pancake.overBake)
-        {
-            StartCoroutine(overBakePan(0.5f, () => DecorationDelete(), pancake));
+            BurnStarted?.Invoke();
+            burnRoutine = StartCoroutine(overBakePan(0.5f));
         }
     }
 
@@ -269,6 +282,7 @@ public class system_playerDevice : MonoBehaviour
     float bakingTimer = 0f;
     void BakingScoring(ref Skillet skillet, ref Pancake pancake)
     {
+        if (system_tutorial.IsRunning && !TutorialBakingEnabled) return;
         if (visualObjNum <= 0)
         {
             return;
@@ -299,6 +313,7 @@ public class system_playerDevice : MonoBehaviour
         {
             pancake.bakingScore = 0f;
         }
+        scoreSystem.SetFireScore(pancake.bakingScore);
     }
 
     public void BakingSpeedChange(float coe, int stoveNum)
@@ -324,7 +339,7 @@ public class system_playerDevice : MonoBehaviour
 
     bool ValidatePlacedDecoration(int typeNum)
     {
-        if (typeNum == 1 && topPlacePrefab[typeNum] == null)
+        if (typeNum == 1 && (topPlacePrefab == null || topPlacePrefab.Length <= typeNum || topPlacePrefab[typeNum] == null))
         {
             Debug.LogError("system_playerDevice: Top Place Prefab を設定してください。", this);
             return false;
@@ -414,6 +429,7 @@ public class system_playerDevice : MonoBehaviour
                 }
             }
         }
+        DecorationPlaced?.Invoke(typeNum);
     }
 
     void ReplaceDecoration(int index, int  typeNum, GameObject prefab)
@@ -464,7 +480,7 @@ public class system_playerDevice : MonoBehaviour
             }
 
             // Move instances and metadata down; never replace the marker references.
-            for (int i = 0; i < visualObjNum; i++)
+            for (int i = 0; i < slots.Length - 1; i++)
             {
                 for (int type = 0; type < stay_visualObjs.GetLength(0); type++)
                 {
@@ -481,12 +497,15 @@ public class system_playerDevice : MonoBehaviour
                 slots[i].is_base = slots[i].objTypeNums.Contains(0);
             }
 
-            slots[visualObjNum].objTypeNums.Clear();
-            slots[visualObjNum].is_base = false;
-            visualObjNum--;
-            if(visualObjNum < 0) system_Scene.EventSceneManager("Result");
+            slots[slots.Length - 1].objTypeNums.Clear();
+            slots[slots.Length - 1].is_base = false;
+            visualObjNum = 0;
+            for (int i = 0; i < slots.Length; i++)
+                if (stay_visualObjs[0, i] != null) visualObjNum++;
         }
-        while (visualObjNum >= 0 && !slots[0].is_base);
+        while (visualObjNum > 0 && !slots[0].is_base);
+        if (visualObjNum == 0 && !system_tutorial.IsRunning)
+            system_Scene.EventSceneManager("Result");
         
     }
     void OnMove(InputAction.CallbackContext ctx)
@@ -515,9 +534,77 @@ public class system_playerDevice : MonoBehaviour
         PancakeMove(ref skillet.pancake);
     }
 
+    void OnTutorialMoveCanceled(InputAction.CallbackContext ctx)
+    {
+        if (system_tutorial.IsRunning && ctx.valueType == typeof(Vector2))
+            SkilletControl(ref skillet, 1);
+    }
+
+    public void ResetTutorialBake()
+    {
+        skillet.pancake.overBake = false;
+        skillet.pancake.bakingScore = 0f;
+        bakingTimer = 0f;
+        spanTimer = 0f;
+        scoreSystem.SetFireScore(0f);
+        UIManager.UpdateBakeUI(0f);
+    }
+
+    // Used between lessons: cancel falling decorations and start with an empty stack.
+    public void ClearTutorialStack()
+    {
+        if (burnRoutine != null) StopCoroutine(burnRoutine);
+        burnRoutine = null;
+        foreach (GameObject falling in add_visualObjs)
+            if (falling != null) { falling.SetActive(false); Destroy(falling); }
+        add_visualObjs.Clear();
+        for (int i = 0; i < stay_visualObjs.GetLength(1); i++)
+        {
+            for (int type = 0; type < stay_visualObjs.GetLength(0); type++)
+            {
+                GameObject placed = stay_visualObjs[type, i];
+                if (placed != null) { placed.SetActive(false); Destroy(placed); }
+                stay_visualObjs[type, i] = null;
+            }
+            skillet.pancake.visualObjs[i].objTypeNums.Clear();
+            skillet.pancake.visualObjs[i].is_base = false;
+        }
+        visualObjNum = 0;
+        ResetTutorialBake();
+    }
+
     void OnCollisionEnter(Collision collision)
     {
-        if (collision.gameObject.layer != LayerMask.NameToLayer("visual")) skillet.pancake.flying = false;
+        CheckPancakeLanding(collision);
+    }
+
+    void OnCollisionStay(Collision collision)
+    {
+        CheckPancakeLanding(collision);
+    }
+
+    void OnCollisionExit(Collision collision)
+    {
+        if (collision.rigidbody == skillet.pancake.rb) skillet.pancake.flying = true;
+    }
+
+    void CheckPancakeLanding(Collision collision)
+    {
+        // This script is on the pan. Only its contact with the pancake body is a landing.
+        // Contacts with the stove, items, or falling decorations must not unlock jumping.
+        if (collision.rigidbody != skillet.pancake.rb ||
+            Time.fixedTime <= lastJumpPhysicsTime + Time.fixedDeltaTime ||
+            skillet.pancake.rb.linearVelocity.y > 0.1f) return;
+
+        for (int i = 0; i < collision.contactCount; i++)
+        {
+            // From the pan's side, the pancake above it pushes downwards.
+            if (collision.GetContact(i).normal.y < -0.5f)
+            {
+                skillet.pancake.flying = false;
+                return;
+            }
+        }
     }
 }
 
