@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 public class EffectManager : MonoBehaviour
 {
@@ -7,6 +8,7 @@ public class EffectManager : MonoBehaviour
 
     [Header("エフェクトのプレハブをアタッチ")]
     public GameObject[] effectPrefabs;
+    
 
     private Dictionary<string, GameObject> effectDictionary = new Dictionary<string, GameObject>();
 
@@ -50,6 +52,7 @@ public class EffectManager : MonoBehaviour
             {
             Instantiate(prefab, position, Quaternion.Euler(-90f,0f,0f));    
             }
+            
             else
             {
             Instantiate(prefab, position, Quaternion.identity);    

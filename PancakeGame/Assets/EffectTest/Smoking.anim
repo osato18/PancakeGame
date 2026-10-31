@@ -130703,7 +130703,7 @@ AnimationClip:
     intParameter: 0
     messageOptions: 0
   - time: 0.9583333
-    functionName: 
+    functionName: EffectDie
     data: 
     objectReferenceParameter: {fileID: 0}
     floatParameter: 0

@@ -533,7 +533,7 @@ public class system_playerDevice : MonoBehaviour
         if (collision.gameObject.layer != LayerMask.NameToLayer("visual"))
         {
           skillet.pancake.flying = false;
-          EffectManager.PlayEffect("Pancake_LandingSmoke_Opaque (1)",skilletObj.transform.position);
+          EffectManager.PlayEffect("Pancake_LandingSmoke_Opaque (1)",pancakeObj.transform.position);
           AudioManager.PlaySE("Pancakedown");  
         } 
     }
