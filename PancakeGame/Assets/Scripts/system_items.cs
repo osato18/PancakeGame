@@ -33,15 +33,18 @@ public class system_items : MonoBehaviour
 
     void Scoring(ref Items items)
     {
+        
         if (items.type.Equals(ItemsType.good))
         {
             scoresSystem.AddScore(100);
             uiManager._currentItemNums[(int)items.type]++;
             UIManager.UpdateItemUI(items.type, uiManager._currentItemNums[(int)items.type]);
         }
+        
         else if (items.type.Equals(ItemsType.bad))
         {
             scoresSystem.AddScore(-100);
+
         }
     } 
 
@@ -66,7 +69,7 @@ public class system_items : MonoBehaviour
             //デバフ時のパーティクル生成と効果音再生
             else if (item.type.Equals(ItemsType.bad))
             {
-                EffectManager.PlayEffect("ItemGetEffect_Sphere005_Particle_Glow",pos);
+                EffectManager.PlayEffect("DebuffEffect",pos);
                 AudioManager.PlaySE("Debuffitem");
             }
            
