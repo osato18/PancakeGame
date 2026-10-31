@@ -449,13 +449,13 @@ public class system_playerDevice : MonoBehaviour
             int previousTopIndex = index - 1;
             for(int i = 0; i < stay_visualObjs.GetLength(0); i++)
             {
-                // if (previousTopIndex >= 0 && stay_visualObjs[i, previousTopIndex] != null)
-                // {
-                //     foreach(int objTypeNum in slots[previousTopIndex].objTypeNums)
-                //     {
-                //         ReplaceDecoration(previousTopIndex, objTypeNum, placePrefab[objTypeNum]);   
-                //     }
-                // }
+                if (previousTopIndex >= 0 && stay_visualObjs[i, previousTopIndex] != null)
+                {
+                    foreach(int objTypeNum in slots[previousTopIndex].objTypeNums)
+                    {
+                        ReplaceDecoration(previousTopIndex, objTypeNum, placePrefab[objTypeNum]);   
+                    }
+                }
             }
         }
         DecorationPlaced?.Invoke(typeNum);
