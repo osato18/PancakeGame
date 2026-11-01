@@ -76,13 +76,13 @@ public class system_event : MonoBehaviour
 
         cautionObj[stoveNum].SetActive(true);
         //警告音再生
-        AudioManager.PlaySE("Nearfire");
+        AudioManager.PlaySE("nearfire");
         yield return new WaitForSeconds(waitSpan);
         cautionObj[stoveNum].SetActive(false);
          //通常火false
         //normalfireObjs[stoveNum].SetActive(false);
         //燃えているSE再生
-        AudioManager.PlaySE("Nowfire");
+        AudioManager.PlaySE("nowfire");
         
         nextAction?.Invoke();
     }
