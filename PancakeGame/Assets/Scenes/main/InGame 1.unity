@@ -13207,6 +13207,10 @@ MonoBehaviour:
   - {fileID: 0}
   playerDeviceSys: {fileID: 278274606}
   scoresSys: {fileID: 1522151681}
+  normalfireObjs:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
   fireObjs:
   - {fileID: 2021447461}
   - {fileID: 3678341}
@@ -13216,7 +13220,7 @@ MonoBehaviour:
   - {fileID: 482172484}
   - {fileID: 2122114837}
   - {fileID: 1614049801}
-  bigFireSpeedCoe: 0
+  bigFireSpeedCoe: 2
 --- !u!1001 &1807117514
 PrefabInstance:
   m_ObjectHideFlags: 0

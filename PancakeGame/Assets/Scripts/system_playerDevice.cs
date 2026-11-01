@@ -164,25 +164,25 @@ public class system_playerDevice : MonoBehaviour
         BakingScoring(ref skillet, ref skillet.pancake);
         OverBakeDemerit();
 
-        var keyboard = Keyboard.current;
-        if (keyboard == null) return;
-        if (keyboard.digit0Key.wasPressedThisFrame)
-        {
-            DecorationAdd(0);
-        }
-        if (keyboard.digit1Key.wasPressedThisFrame)
-        {
-            DecorationAdd(1);
-        }
+        // var keyboard = Keyboard.current;
+        // if (keyboard == null) return;
+        // if (keyboard.digit0Key.wasPressedThisFrame)
+        // {
+        //     DecorationAdd(0);
+        // }
+        // if (keyboard.digit1Key.wasPressedThisFrame)
+        // {
+        //     DecorationAdd(1);
+        // }
 
-        if (keyboard.digit2Key.wasPressedThisFrame)
-        {
-            DecorationAdd(2);
-        }
-        if (keyboard.digit3Key.wasPressedThisFrame)
-        {
-            DecorationAdd(3);
-        }
+        // if (keyboard.digit2Key.wasPressedThisFrame)
+        // {
+        //     DecorationAdd(2);
+        // }
+        // if (keyboard.digit3Key.wasPressedThisFrame)
+        // {
+        //     DecorationAdd(3);
+        // }
     }
 
     void FixedUpdate()
@@ -371,18 +371,14 @@ public class system_playerDevice : MonoBehaviour
         bakingCoe[stoveNum] = coe;
     }
 
-    // visualObjNum is the number of occupied pancake levels.
+    // visualObjNum is the highest occupied level index plus one, including toppings.
     bool TryGetDecorationIndex(int typeNum, out int index)
     {
-        if(visualObjNum <= 0)
-        {
-            visualObjNum = 0;
-        }
-        else if(!skillet.pancake.visualObjs[visualObjNum - 1].is_base && typeNum != 0)
-        {
-            visualObjNum--;
-        }
         index = visualObjNum;
+        if (index > 0 && !skillet.pancake.visualObjs[index - 1].is_base && typeNum != 0)
+        {
+            index--;
+        }
         if (typeNum < 0 || typeNum >= stay_visualObjs.GetLength(0) ||
             index < 0 || index >= skillet.pancake.visualObjs.Length)
             return false;
@@ -475,7 +471,7 @@ public class system_playerDevice : MonoBehaviour
         {
             addFlag[typeNum] = true;
         }
-        visualObjNum++;
+        visualObjNum = Mathf.Max(visualObjNum, index + 1);
         if (typeNum == 0)
         {
             for(int i = 0; i < addFlag.Length; i++)
@@ -586,8 +582,16 @@ public class system_playerDevice : MonoBehaviour
             slots[slots.Length - 1].is_base = false;
             visualObjNum = 0;
             for (int i = 0; i < slots.Length; i++)
-                if (stay_visualObjs[0, i] != null) visualObjNum++;
-            visualObjNum++;
+            {
+                for (int type = 0; type < stay_visualObjs.GetLength(0); type++)
+                {
+                    if (stay_visualObjs[type, i] != null)
+                    {
+                        visualObjNum = i + 1;
+                        break;
+                    }
+                }
+            }
         }
         while (visualObjNum > 0 && !slots[0].is_base);
         if (visualObjNum == 0 && !system_tutorial.IsRunning)

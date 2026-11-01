@@ -80,7 +80,7 @@ public class system_event : MonoBehaviour
         yield return new WaitForSeconds(waitSpan);
         cautionObj[stoveNum].SetActive(false);
          //通常火false
-        normalfireObjs[stoveNum].SetActive(false);
+        //normalfireObjs[stoveNum].SetActive(false);
         //燃えているSE再生
         AudioManager.PlaySE("Nowfire");
         
@@ -101,7 +101,7 @@ public class system_event : MonoBehaviour
         else
         {
             //普通の火戻す
-            normalfireObjs[stoveNum].SetActive(true);
+            //normalfireObjs[stoveNum].SetActive(true);
             fireObjs[stoveNum].SetActive(false);
 
         }
