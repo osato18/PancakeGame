@@ -310,19 +310,10 @@ public class system_playerDevice : MonoBehaviour
 
     IEnumerator overBakePan(float waitSpan)
     {
-        //ReplaceDecoration内で煙作成
-        ReplaceDecoration(0, 0, overBakePrefab);
-        //パンケーキこげたときの音再生
-        AudioManager.PlaySE("Burned");
-        //ここ絶対に後で直す
-        yield return new WaitForSeconds(waitSpan);
-
-        pancake.overBake = false;
-        pancake.bakingScore = 0f;
-        
-
-        nextAction?.Invoke();
         if (overBakePrefab != null) ReplaceDecoration(0, 0, overBakePrefab);
+        // パンケーキこげたときの音再生（Iwama_EffectPlayerの演出）
+        AudioManager.PlaySE("Burned");
+
         yield return new WaitForSeconds(waitSpan);
         DecorationDelete();
         yield return new WaitForSeconds(0.1f);
@@ -337,11 +328,6 @@ public class system_playerDevice : MonoBehaviour
         if (pancake.bakingScore >= p_overbakingScore && !pancake.overBake)
         {
             pancake.overBake = true;
-            
-        }
-        if (pancake.overBake)
-        {
-            StartCoroutine(overBakePan(0.5f, () => DecorationDelete(), pancake));
             BurnStarted?.Invoke();
             burnRoutine = StartCoroutine(overBakePan(0.5f));
         }
@@ -622,12 +608,6 @@ public class system_playerDevice : MonoBehaviour
             SkilletControl(ref skillet, (int)moveVec.x + 1);
         }
     }
-    // void OnMoveCanceled(InputAction.CallbackContext ctx)
-    // {
-    //     // ★ キャンセル時（値が (0, 0) になったとき）も SkilletControl を呼び出す
-    //     Vector2 move = ctx.ReadValue<Vector2>();
-    //     SkilletControl(ref skillet, move);
-    // }
 
     void OnJump(InputAction.CallbackContext ctx)
     {
@@ -642,12 +622,12 @@ public class system_playerDevice : MonoBehaviour
 
     public void ResetTutorialBake()
     {
-        skillet.pancake.overBake = false;
         skillet.pancake.bakingScore = 0f;
         bakingTimer = 0f;
         spanTimer = 0f;
         scoreSystem.SetFireScore(0f);
         UIManager.UpdateBakeUI(0f);
+        skillet.pancake.overBake = false;
     }
 
     // Used between lessons: cancel falling decorations and start with an empty stack.

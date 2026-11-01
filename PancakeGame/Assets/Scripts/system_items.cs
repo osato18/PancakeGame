@@ -103,7 +103,7 @@ public class system_items : MonoBehaviour
             
             Vector3 pos=this.transform.position;
             //バフエフェクト生成と効果音再生
-            if (item.type.Equals(ItemsType.good))
+            if (!item.type.Equals(ItemsType.bad))
             {
                 EffectManager.PlayEffect("ItemGetEffect_Sphere005_Particle_Glow",pos);
                 AudioManager.PlaySE("BuffGet");
@@ -114,7 +114,7 @@ public class system_items : MonoBehaviour
                 EffectManager.PlayEffect("DebuffEffect",pos);
                 AudioManager.PlaySE("Debuffitem");
             }
-           
+
             if (tutorialItem) TutorialResolved?.Invoke(true);
             Destroy(gameObject);
         }
