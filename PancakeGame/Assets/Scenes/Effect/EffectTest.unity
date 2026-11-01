@@ -2299,12 +2299,12 @@ MonoBehaviour:
   - {fileID: 7800954151807442271, guid: 73eb2f1dde629a1498bbccb7759acfa6, type: 3}
   placePrefab:
   - {fileID: 3604349274617590880, guid: b7ff9f2c8215d2549b55d1348819d6c8, type: 3}
-  - {fileID: 1447044972334649316, guid: 031b26e126a7a284fae77f4142380180, type: 3}
+  - {fileID: 1689073353279971120, guid: 414c2c03712f6204ba0d98c4d0c530d8, type: 3}
   - {fileID: 7638384548174257164, guid: 2de8f3a1ae0581145821b502d263e38a, type: 3}
   - {fileID: 854563482064678742, guid: 673c9e77b3d7c5e46bfeae1e2738c710, type: 3}
   topPlacePrefab:
-  - {fileID: 1447044972334649316, guid: 031b26e126a7a284fae77f4142380180, type: 3}
-  - {fileID: 1447044972334649316, guid: 031b26e126a7a284fae77f4142380180, type: 3}
+  - {fileID: 3604349274617590880, guid: b7ff9f2c8215d2549b55d1348819d6c8, type: 3}
+  - {fileID: 1689073353279971120, guid: 414c2c03712f6204ba0d98c4d0c530d8, type: 3}
   - {fileID: 7638384548174257164, guid: 2de8f3a1ae0581145821b502d263e38a, type: 3}
   - {fileID: 854563482064678742, guid: 673c9e77b3d7c5e46bfeae1e2738c710, type: 3}
   overBakePrefab: {fileID: 3015303501366533203, guid: e519b04473a45734b8762ff912de5662, type: 3}
@@ -4720,7 +4720,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::system_itemsSpawner
   uiManager: {fileID: 1522151683}
   scoresSystem: {fileID: 1522151681}
-  playerDeviceSys: {fileID: 0}
+  playerDeviceSys: {fileID: 278274606}
   itemObj:
   - {fileID: 3104304538766542927, guid: 8eed3d6fe80abca47b7b2918d484a3b7, type: 3}
   - {fileID: 2497543874494055079, guid: 138cce422a81bef4fac8a03ab718063d, type: 3}
@@ -7976,12 +7976,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1066739452}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1196214922}
+  m_Father: {fileID: 1522151682}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1066739454
 MonoBehaviour:
@@ -7997,7 +7997,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::system_itemsSpawner
   uiManager: {fileID: 1522151683}
   scoresSystem: {fileID: 1522151681}
-  playerDeviceSys: {fileID: 0}
+  playerDeviceSys: {fileID: 278274606}
   itemObj:
   - {fileID: 3104304538766542927, guid: 8eed3d6fe80abca47b7b2918d484a3b7, type: 3}
   - {fileID: 2497543874494055079, guid: 138cce422a81bef4fac8a03ab718063d, type: 3}
@@ -9481,7 +9481,6 @@ Transform:
   m_Children:
   - {fileID: 600564072}
   - {fileID: 1667193151}
-  - {fileID: 1066739453}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1202454325
@@ -11612,7 +11611,7 @@ MonoBehaviour:
   scoreTxt: {fileID: 1810790047}
   timerText: {fileID: 1377219946}
   timer: 0
-  maxTime: 300
+  maxTime: 180
 --- !u!4 &1522151682
 Transform:
   m_ObjectHideFlags: 0
@@ -11625,7 +11624,8 @@ Transform:
   m_LocalPosition: {x: 202.86871, y: -0, z: -301.02313}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 1066739453}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1522151683
@@ -12978,7 +12978,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::system_itemsSpawner
   uiManager: {fileID: 1522151683}
   scoresSystem: {fileID: 1522151681}
-  playerDeviceSys: {fileID: 0}
+  playerDeviceSys: {fileID: 278274606}
   itemObj:
   - {fileID: 3104304538766542927, guid: 8eed3d6fe80abca47b7b2918d484a3b7, type: 3}
   - {fileID: 2497543874494055079, guid: 138cce422a81bef4fac8a03ab718063d, type: 3}
@@ -17302,8 +17302,8 @@ SceneRoots:
   m_Roots:
   - {fileID: 836877772}
   - {fileID: 600803962}
-  - {fileID: 560567752}
   - {fileID: 1568213645}
+  - {fileID: 560567752}
   - {fileID: 762389330}
   - {fileID: 937008616}
   - {fileID: 366946810}

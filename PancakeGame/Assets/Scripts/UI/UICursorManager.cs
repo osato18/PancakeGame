@@ -11,6 +11,12 @@ public class UICursorManager : MonoBehaviour
     // 現在選択しているボタンの番号
     private int _currentIndex = 1;
 
+    private void Start()
+    {
+        // 起動時に初期選択（中央：1）の色を反映させる
+        UpdateSelection();
+    }
+
     /// <summary>
     /// Move入力
     /// 0：左、1：中央、2：右
@@ -42,7 +48,6 @@ public class UICursorManager : MonoBehaviour
             return;
 
         buttons[_currentIndex].onClick.Invoke();
-    
     }
 
     /// <summary>
@@ -55,12 +60,16 @@ public class UICursorManager : MonoBehaviour
             if (buttons[i] == null)
                 continue;
 
-            // 選択中のボタンを強調表示
             ColorBlock colors = buttons[i].colors;
 
-            colors.normalColor = (i == _currentIndex)
-                ? Color.red
-                : Color.white;
+            // 選択中の場合は赤、そうでない場合は白にする
+            Color targetColor = (i == _currentIndex) ? Color.red : Color.white;
+
+            // 各状態の色を統一して上書きする
+            colors.normalColor = targetColor;
+            colors.highlightedColor = targetColor;
+            colors.selectedColor = targetColor;
+            colors.pressedColor = targetColor;
 
             buttons[i].colors = colors;
         }
@@ -69,13 +78,13 @@ public class UICursorManager : MonoBehaviour
     public void StartButtonClick()
     {
         Debug.Log("スタート！");
-        SceneManager.LoadScene("InGame");
+        SceneManager.LoadScene("EffectTest");
     }
 
     public void TutorialButtonClick()
     {
         Debug.Log("チュートリアル");
-        SceneManager.LoadScene("Tutorial");
+        //SceneManager.LoadScene("Tutorial");
     }
 
     public void CreditButtonClick()
