@@ -3,7 +3,6 @@ using System.Collections;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.InputSystem;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
@@ -69,6 +68,7 @@ public class system_tutorial : MonoBehaviour
         int[] gauge = UIManager.GetItemNums(ItemsType.strawberry);
         if (gauge[1] <= 0) { Fail("加算アイテムゲージの最大数を1以上に設定してください。"); return; }
         player.JumpSucceeded += OnJumpSucceeded;
+        player.JumpRequested += ContinueTutorial;
         player.LaneArrived += OnLaneArrived;
         player.DecorationPlaced += OnDecorationPlaced;
         player.BurnStarted += OnBurnStarted;
@@ -88,8 +88,6 @@ public class system_tutorial : MonoBehaviour
             scoreHighlight.SetActive(Time.unscaledTime < scoreHighlightUntil);
             scoreHighlightAlpha.alpha = 0.65f + 0.35f * Mathf.Sin(Time.unscaledTime * 5f);
         }
-        if (waitingForContinue && Keyboard.current != null && Keyboard.current.enterKey.wasPressedThisFrame)
-            ContinueTutorial();
     }
 
     public void ContinueTutorial()
@@ -125,7 +123,7 @@ public class system_tutorial : MonoBehaviour
         gameEvents.SetTutorialFire(-1);
         tutorialPanel.SetActive(true);
         tutorialTitleText.text = title;
-        tutorialExplainText.text = explanation + "\n「はじめる」または Enter で進む";
+        tutorialExplainText.text = explanation + "\n「はじめる」またはジャンプ入力で進む";
         continueRequested = false;
         waitingForContinue = true;
         continueButton.gameObject.SetActive(true);
@@ -426,6 +424,7 @@ public class system_tutorial : MonoBehaviour
             if (subscribed)
             {
                 player.JumpSucceeded -= OnJumpSucceeded;
+                player.JumpRequested -= ContinueTutorial;
                 player.LaneArrived -= OnLaneArrived;
                 player.DecorationPlaced -= OnDecorationPlaced;
                 player.BurnStarted -= OnBurnStarted;
