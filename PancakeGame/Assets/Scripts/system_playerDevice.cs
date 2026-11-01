@@ -26,8 +26,10 @@ public class system_playerDevice : MonoBehaviour
     [SerializeField] private InputAction pancakeAction;
 
     [SerializeField] private float s_moveSpeed;
-    [SerializeField] private float p_jumpTime;
-    [SerializeField] private float p_topPos;
+    [SerializeField, Min(0.01f), Tooltip("着地までの希望時間。自由落下時間＋0.1秒を下限として計算します。")]
+    private float p_jumpTime;
+    [SerializeField, Min(0.01f), Tooltip("離陸位置から最高点までの上昇量")]
+    private float p_topPos;
     [SerializeField] private float p_bakingSpeed;
     [SerializeField] private float p_bakingAddScore;
     [SerializeField] private float p_overbakingScore;
@@ -36,7 +38,10 @@ public class system_playerDevice : MonoBehaviour
 
     
 
-    private float GRAVITY = 3.141592f;
+    private bool controlledJump, rising;
+    private float riseElapsed, riseDuration, riseHeight;
+    private bool savedUseGravity;
+    private float savedLinearDamping;
 
     private float moveTime = 0.0f;
 
@@ -98,6 +103,7 @@ public class system_playerDevice : MonoBehaviour
 
     void OnEnable()
     {
+        if (skilletAction == null || pancakeAction == null) return;
         // 登録
         skilletAction.performed += OnMove;
         skilletAction.canceled += OnTutorialMoveCanceled;
@@ -105,6 +111,7 @@ public class system_playerDevice : MonoBehaviour
     }
     void OnDisable()
     {
+        RestoreJumpPhysics();
         // 登録解除
         if (skilletAction != null)
         {
@@ -165,30 +172,66 @@ public class system_playerDevice : MonoBehaviour
         BakingScoring(ref skillet, ref skillet.pancake);
         OverBakeDemerit();
 
-        // var keyboard = Keyboard.current;
-        // if (keyboard == null) return;
-        // if (keyboard.digit0Key.wasPressedThisFrame)
-        // {
-        //     DecorationAdd(0);
-        // }
-        // if (keyboard.digit1Key.wasPressedThisFrame)
-        // {
-        //     DecorationAdd(1);
-        // }
+        var keyboard = Keyboard.current;
+        if (keyboard == null) return;
+        if (keyboard.digit0Key.wasPressedThisFrame)
+        {
+            DecorationAdd(0);
+        }
+        if (keyboard.digit1Key.wasPressedThisFrame)
+        {
+            DecorationAdd(1);
+        }
 
-        // if (keyboard.digit2Key.wasPressedThisFrame)
-        // {
-        //     DecorationAdd(2);
-        // }
-        // if (keyboard.digit3Key.wasPressedThisFrame)
-        // {
-        //     DecorationAdd(3);
-        // }
+        if (keyboard.digit2Key.wasPressedThisFrame)
+        {
+            DecorationAdd(2);
+        }
+        if (keyboard.digit3Key.wasPressedThisFrame)
+        {
+            DecorationAdd(3);
+        }
     }
 
     void FixedUpdate()
     {
+        UpdateJumpRise();
         VirtualPancake(add_visualObjs);
+    }
+
+    void UpdateJumpRise()
+    {
+        if (!rising) return;
+        Rigidbody body = skillet.pancake.rb;
+        Vector3 velocity = body.linearVelocity;
+        if (riseElapsed >= riseDuration)
+        {
+            // The previous physics step reached the apex. Start free fall from rest.
+            velocity.y = 0f;
+            body.linearVelocity = velocity;
+            body.useGravity = true;
+            rising = false;
+            return;
+        }
+
+        // Use the average velocity over this physics step to avoid overshooting H.
+        // y(t) = H * (2u - u²), u = t / riseDuration.
+        float next = Mathf.Min(riseElapsed + Time.fixedDeltaTime, riseDuration);
+        float u0 = riseElapsed / riseDuration;
+        float u1 = next / riseDuration;
+        velocity.y = riseHeight * (u1 - u0) * (2f - u0 - u1) / Time.fixedDeltaTime;
+        body.linearVelocity = velocity;
+        riseElapsed = next;
+    }
+
+    void RestoreJumpPhysics()
+    {
+        if (controlledJump && skillet.pancake.rb != null)
+        {
+            skillet.pancake.rb.useGravity = savedUseGravity;
+            skillet.pancake.rb.linearDamping = savedLinearDamping;
+        }
+        rising = controlledJump = false;
     }
 
     void LocalPosRivise(Transform retransform, float moveDis)
@@ -253,8 +296,28 @@ public class system_playerDevice : MonoBehaviour
     void PancakeMove(ref Pancake pancake)
     {
         if (system_tutorial.IsRunning && (!TutorialControlsEnabled || !TutorialJumpAllowed)) return;
-        if (!pancake.flying)
+        if (!pancake.flying && !controlledJump)
         {
+            float gravity = -Physics.gravity.y;
+            if (gravity <= 0f || p_topPos <= 0f || p_jumpTime <= 0f ||
+                float.IsNaN(p_topPos) || float.IsInfinity(p_topPos) ||
+                float.IsNaN(p_jumpTime) || float.IsInfinity(p_jumpTime))
+            {
+                Debug.LogError("ジャンプには下向きの重力と、有限の正の高さ・時間が必要です。", this);
+                return;
+            }
+            pancake.jumpTime = p_jumpTime;
+            pancake.topPos = p_topPos;
+            float fallTime = Mathf.Sqrt(2f * pancake.topPos / gravity);
+            float effectiveTime = Mathf.Max(pancake.jumpTime, fallTime + 0.1f);
+            riseDuration = Mathf.Max(0.1f, effectiveTime - fallTime);
+            riseHeight = pancake.topPos;
+            riseElapsed = 0f;
+            savedUseGravity = pancake.rb.useGravity;
+            savedLinearDamping = pancake.rb.linearDamping;
+            pancake.rb.useGravity = false;
+            pancake.rb.linearDamping = 0f;
+            controlledJump = rising = true;
             ResetBakingScore(ref pancake);
             skillet.pancake.flying = true;
             //ジャンプ時の効果音再生
@@ -263,8 +326,10 @@ public class system_playerDevice : MonoBehaviour
             lastJumpPhysicsTime = Time.fixedTime;
 
             Debug.Log("GameJump");
-            float f_Vel = pancake.topPos / pancake.jumpTime + GRAVITY * pancake.jumpTime / 2;
-            pancake.rb.AddForce(new Vector3(0.0f, f_Vel, 0.0f), ForceMode.VelocityChange);
+            // FixedUpdate applies the ascent velocity before each physics simulation.
+            Vector3 velocity = pancake.rb.linearVelocity;
+            velocity.y = 0f;
+            pancake.rb.linearVelocity = velocity;
 
             JumpSucceeded?.Invoke();
         }
@@ -453,7 +518,7 @@ public class system_playerDevice : MonoBehaviour
 
         if(typeNum == 1)
         {
-            LocalPosRivise(instance.transform, -0.11f);
+            LocalPosRivise(instance.transform, -0.55f);
         }
         else if(typeNum == 2)
         {
@@ -661,12 +726,6 @@ public class system_playerDevice : MonoBehaviour
 
     void OnCollisionEnter(Collision collision)
     {
-        if (collision.gameObject.layer != LayerMask.NameToLayer("visual"))
-        {
-          skillet.pancake.flying = false;
-          EffectManager.PlayEffect("Pancake_LandingSmoke_Opaque (1)",pancakeObj.transform.position);
-          AudioManager.PlaySE("pancakedown");  
-        } 
         CheckPancakeLanding(collision);
     }
 
@@ -684,7 +743,7 @@ public class system_playerDevice : MonoBehaviour
     {
         // This script is on the pan. Only its contact with the pancake body is a landing.
         // Contacts with the stove, items, or falling decorations must not unlock jumping.
-        if (collision.rigidbody != skillet.pancake.rb ||
+        if (rising || collision.rigidbody != skillet.pancake.rb ||
             Time.fixedTime <= lastJumpPhysicsTime + Time.fixedDeltaTime ||
             skillet.pancake.rb.linearVelocity.y > 0.1f) return;
 
@@ -693,7 +752,14 @@ public class system_playerDevice : MonoBehaviour
             // From the pan's side, the pancake above it pushes downwards.
             if (collision.GetContact(i).normal.y < -0.5f)
             {
+                bool wasFlying = skillet.pancake.flying;
                 skillet.pancake.flying = false;
+                RestoreJumpPhysics();
+                if (wasFlying)
+                {
+                    EffectManager.PlayEffect("Pancake_LandingSmoke_Opaque (1)", pancakeObj.transform.position);
+                    AudioManager.PlaySE("pancakedown");
+                }
                 return;
             }
         }

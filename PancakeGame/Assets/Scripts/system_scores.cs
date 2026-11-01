@@ -21,7 +21,7 @@ public class system_scores : MonoBehaviour
 
     void Start()
     {
-
+        SetScore(0);
     }
 
     void Update()

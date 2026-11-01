@@ -32,6 +32,26 @@ public class UIManager : MonoBehaviour
             ? _instance._itemGauges[(int)type].rectTransform : null;
     public static RectTransform BakeGaugeRect =>
         _instance != null && _instance._bakeGauge != null ? _instance._bakeGauge.rectTransform : null;
+
+    public static bool TryGetItemGaugeBounds(Transform relativeTo, out Bounds bounds)
+    {
+        bounds = new Bounds();
+        if (_instance == null || _instance._itemGauges == null) return false;
+        bool found = false;
+        var corners = new Vector3[4];
+        foreach (Image gauge in _instance._itemGauges)
+        {
+            if (gauge == null) continue;
+            gauge.rectTransform.GetWorldCorners(corners);
+            foreach (Vector3 corner in corners)
+            {
+                Vector3 point = relativeTo.InverseTransformPoint(corner);
+                if (!found) { bounds = new Bounds(point, Vector3.zero); found = true; }
+                else bounds.Encapsulate(point);
+            }
+        }
+        return found;
+    }
     public static RectTransform ScoreRect =>
         _instance != null && _instance._scoreText != null ? _instance._scoreText.rectTransform : null;
 

@@ -222,14 +222,14 @@ public class system_tutorial : MonoBehaviour
             if (failed) yield break;
         }
 
-        yield return ShowLesson("⑥ 焼きゲージ", "黄色い枠の焼きゲージに注目！/n最初はジャンプを止めて焦げを体験します。その後はジャンプで焼きゲージを下げよう。", UIManager.BakeGaugeRect);
+        yield return ShowLesson("⑥ 焼きゲージ", "黄色い枠の焼きゲージに注目！\n最初はジャンプを止めて焦げを体験します。その後はジャンプで焼きゲージを下げよう。", UIManager.BakeGaugeRect);
         yield return FreshPancake();
         if (failed) yield break;
         step = Step.Bake;
         burned = false;
         player.TutorialJumpAllowed = false;
         player.TutorialBakingEnabled = true;
-        tutorialExplainText.text = "いまはジャンプできません。焼きゲージが満タンになると焦げます。\n焦げるとパンケーキが一つ消え、パンケーキが0個になるとゲームオーバーです\n焼きゲージに比例したスコアが加算される";
+        tutorialExplainText.text = "いまはジャンプできません。\n焼きゲージが満タンになると焦げます。\n焦げるとパンケーキが一つ消え、\nパンケーキが0個になるとゲームオーバーです\n焼きゲージに比例したスコアが加算されます";
         yield return new WaitUntil(() => burned);
         yield return new WaitUntil(() => !player.IsBurning);
         player.TutorialBakingEnabled = false;
@@ -255,7 +255,7 @@ public class system_tutorial : MonoBehaviour
             yield return null;
         }
 
-        yield return ShowLesson("⑦ 火事イベント", $"火事に合計{fireContactSeconds:F0}秒触れて、焼きゲージの上がり方を見よう。その後{survivalSeconds:F0}秒間避けよう。火事のコンロは変わりません。", UIManager.BakeGaugeRect);
+        yield return ShowLesson("⑦ 火事イベント", $"火事に合計{fireContactSeconds:F0}秒触れて、\n焼きゲージの上がり方を見よう。\nその後{survivalSeconds:F0}秒間避けよう。火事のコンロは変わりません。", UIManager.BakeGaugeRect);
         yield return FreshPancake();
         if (failed) yield break;
         step = Step.Fire;
@@ -321,6 +321,15 @@ public class system_tutorial : MonoBehaviour
         }
         highlightAlpha = null;
         gaugeHighlight = CreateHighlight(target, "TutorialGaugeHighlight", out highlightAlpha);
+        if (target != null && target == UIManager.ItemGaugeRect(ItemsType.strawberry) &&
+            UIManager.TryGetItemGaugeBounds(target, out Bounds bounds))
+        {
+            var rect = (RectTransform)gaugeHighlight.transform;
+            rect.anchorMin = rect.anchorMax = target.pivot;
+            rect.pivot = new Vector2(0.5f, 0.5f);
+            rect.anchoredPosition = new Vector2(bounds.center.x, bounds.center.y);
+            rect.sizeDelta = new Vector2(bounds.size.x + 4f, bounds.size.y + 4f);
+        }
     }
 
     static GameObject CreateHighlight(RectTransform target, string name, out CanvasGroup alpha)
@@ -471,8 +480,8 @@ public class system_tutorial : MonoBehaviour
         tutorialPanel = new GameObject("TutorialPanel", typeof(RectTransform), typeof(Image));
         var rect = (RectTransform)tutorialPanel.transform;
         rect.SetParent(canvasObj.transform, false);
-        rect.anchorMin = new Vector2(0.27f, 0.68f);
-        rect.anchorMax = new Vector2(0.72f, 0.93f);
+        rect.anchorMin = new Vector2(0.28f, 0.66f);
+        rect.anchorMax = new Vector2(0.71f, 0.95f);
         rect.offsetMin = rect.offsetMax = Vector2.zero;
         tutorialPanel.GetComponent<Image>().color = new Color(0.08f, 0.08f, 0.12f, 0.94f);
         tutorialTitleText = MakeText("Title", rect, font, new Vector2(0.03f, 0.7f), new Vector2(0.97f, 0.97f), 34);
