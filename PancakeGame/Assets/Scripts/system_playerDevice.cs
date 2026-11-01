@@ -257,7 +257,7 @@ public class system_playerDevice : MonoBehaviour
             ResetBakingScore(ref pancake);
             skillet.pancake.flying = true;
             //ジャンプ時の効果音再生
-            AudioManager.PlaySE("Flypancake");
+            AudioManager.PlaySE("flypancake");
 
             lastJumpPhysicsTime = Time.fixedTime;
 
@@ -312,7 +312,7 @@ public class system_playerDevice : MonoBehaviour
     {
         if (overBakePrefab != null) ReplaceDecoration(0, 0, overBakePrefab);
         // パンケーキこげたときの音再生（Iwama_EffectPlayerの演出）
-        AudioManager.PlaySE("Burned");
+        AudioManager.PlaySE("burned");
 
         yield return new WaitForSeconds(waitSpan);
         DecorationDelete();
@@ -659,7 +659,7 @@ public class system_playerDevice : MonoBehaviour
         {
           skillet.pancake.flying = false;
           EffectManager.PlayEffect("Pancake_LandingSmoke_Opaque (1)",pancakeObj.transform.position);
-          AudioManager.PlaySE("Pancakedown");  
+          AudioManager.PlaySE("pancakedown");  
         } 
         CheckPancakeLanding(collision);
     }
