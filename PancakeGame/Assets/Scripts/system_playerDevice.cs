@@ -50,6 +50,7 @@ public class system_playerDevice : MonoBehaviour
     private bool[] addFlag = new bool[4];
 
     public event Action JumpSucceeded;
+    public event Action JumpRequested;
     public event Action<int> LaneArrived;
     public event Action<int> DecorationPlaced;
     public event Action BurnStarted;
@@ -615,6 +616,7 @@ public class system_playerDevice : MonoBehaviour
 
     void OnJump(InputAction.CallbackContext ctx)
     {
+        JumpRequested?.Invoke();
         PancakeMove(ref skillet.pancake);
     }
 

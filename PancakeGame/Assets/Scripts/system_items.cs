@@ -65,7 +65,7 @@ public class system_items : MonoBehaviour
         scoresSystem.AddScore(addScore);
         if (items.type.Equals(ItemsType.strawberry))
         {
-            if(!p_DeviceSys.AddFlagCheck((int)(item.type) + 1))
+            if(!p_DeviceSys.AddFlagCheck((int)(items.type) + 1))
             {
                 uiManager._currentItemNums[(int)items.type]++;
                 UIManager.UpdateItemUI(items.type, uiManager._currentItemNums[(int)items.type]);
@@ -73,7 +73,7 @@ public class system_items : MonoBehaviour
         }
         else if (items.type.Equals(ItemsType.cream))
         {
-            if(!p_DeviceSys.AddFlagCheck((int)(item.type) + 1))
+            if(!p_DeviceSys.AddFlagCheck((int)(items.type) + 1))
             {
                 uiManager._currentItemNums[(int)items.type]++;
                 UIManager.UpdateItemUI(items.type, uiManager._currentItemNums[(int)items.type]);
@@ -81,7 +81,7 @@ public class system_items : MonoBehaviour
         }
         else if (items.type.Equals(ItemsType.blueberry))
         {
-            if(!p_DeviceSys.AddFlagCheck((int)(item.type) + 1))
+            if(!p_DeviceSys.AddFlagCheck((int)(items.type) + 1))
             {
                 uiManager._currentItemNums[(int)items.type]++;
                 UIManager.UpdateItemUI(items.type, uiManager._currentItemNums[(int)items.type]);
