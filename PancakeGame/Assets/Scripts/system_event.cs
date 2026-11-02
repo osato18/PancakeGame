@@ -41,7 +41,21 @@ public class system_event : MonoBehaviour
             if (caution != null) caution.SetActive(false);
         TutorialFireLane = lane;
     }
+
+    public void GamePose()
+    {
+        Time.timeScale = 0.0f;
+    }
+    public void GameStart()
+    {
+        Time.timeScale = 1.0f;
+    }
     [SerializeField] private float bigFireSpeedCoe;
+
+    void Awake()
+    {
+        GamePose();
+    }
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()

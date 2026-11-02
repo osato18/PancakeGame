@@ -19,9 +19,9 @@ public class ResultManager : MonoBehaviour
     [SerializeField] private int blueberryScore = 40;                  //ブルーベリー１つあたりのスコア
 
     [Header("名付けのアイテムの個数閾値")]
-    [SerializeField] private int namedStrawberryCount = 20;
-    [SerializeField] private int namedCreamCount = 20;
-    [SerializeField] private int namedBlueberryCount = 20;
+    [SerializeField] private int namedStrawberryCount = 2;
+    [SerializeField] private int namedCreamCount = 2;
+    [SerializeField] private int namedBlueberryCount = 2;
 
     //アイテム個数のカウント
     private int pancakeCount = 0;
