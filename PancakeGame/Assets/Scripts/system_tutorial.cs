@@ -300,7 +300,7 @@ public class system_tutorial : MonoBehaviour
         tutorialPanel.SetActive(false);
         Cleanup();
         onCompleted?.Invoke();
-        SceneManager.LoadScene("InGame");
+        SceneManager.LoadScene("EffectTest");
     }
 
     IEnumerator RefillFirePancake()

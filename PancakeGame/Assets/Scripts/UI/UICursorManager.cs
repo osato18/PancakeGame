@@ -84,7 +84,7 @@ public class UICursorManager : MonoBehaviour
     public void TutorialButtonClick()
     {
         Debug.Log("チュートリアル");
-        //SceneManager.LoadScene("Tutorial");
+        SceneManager.LoadScene("EffectTest 1");
     }
 
     public void CreditButtonClick()
