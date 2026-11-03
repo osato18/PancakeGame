@@ -24,6 +24,9 @@ public class UIManager : MonoBehaviour
 
     [Header("各アイテムの最大数")]
     [SerializeField] private int[] _itemMaxNums;
+
+    [Header("ピンチ演出用Panel")]
+    [SerializeField]private Image _crisisPanelImg;
     private static UIManager _instance;
 
     public static RectTransform ItemGaugeRect(ItemsType type) =>
@@ -98,8 +101,12 @@ public class UIManager : MonoBehaviour
     //焼きゲージの値を計算した後にこの関数を呼ぶ
     public static void UpdateBakeUI(float currentBake)
     {
-        float updateBake = currentBake / _instance._maxBake;
-        _instance._bakeGauge.fillAmount = updateBake;
+        float currentBakeRate = currentBake / _instance._maxBake;
+        _instance._bakeGauge.fillAmount = currentBakeRate;
+        if (currentBake >= 0.7)
+        {
+            _instance._crisisPanelImg.color.a=10;
+        }
     }
 
     //スコアの文字表示
