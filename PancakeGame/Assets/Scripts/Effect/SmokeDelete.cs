@@ -11,7 +11,7 @@ public class SmokeDelete : MonoBehaviour
 
     IEnumerator SmokeDie()
     {
-        yield return new WaitForSeconds(4f);
+        yield return new WaitForSeconds(0.5f);
         Destroy(gameObject);
     }
     
