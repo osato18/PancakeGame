@@ -103,9 +103,15 @@ public class UIManager : MonoBehaviour
     {
         float currentBakeRate = currentBake / _instance._maxBake;
         _instance._bakeGauge.fillAmount = currentBakeRate;
-        if (currentBake >= 0.7)
+        if (currentBake >= 0.6f)
         {
-            _instance._crisisPanelImg.color.a=10;
+            float alphaRate=Mathf.Clamp01((currentBakeRate - 0.7f) / 0.3f);
+            byte alpha=(byte)(140*alphaRate);
+            _instance._crisisPanelImg.color=new Color32(255,0,0,alpha);
+        }
+        else
+        {
+            _instance._crisisPanelImg.color=new Color32(255,0,0,0);
         }
     }
 
