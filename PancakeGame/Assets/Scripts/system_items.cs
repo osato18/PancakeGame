@@ -111,7 +111,7 @@ public class system_items : MonoBehaviour
             //デバフ時のパーティクル生成と効果音再生
             else if (item.type.Equals(ItemsType.bad))
             {
-                EffectManager.PlayEffect("DebuffEffect",pos);
+                EffectManager.PlayEffect("purpleDebuffEffect",pos);
                 AudioManager.PlaySE("Debuffitem");
             }
 

@@ -34,6 +34,7 @@ public class system_playerDevice : MonoBehaviour
     [SerializeField] private float p_bakingAddScore;
     [SerializeField] private float p_overbakingScore;
     [SerializeField] private float p_bakingResetScore;
+    
 
 
     
@@ -379,6 +380,9 @@ public class system_playerDevice : MonoBehaviour
         if (overBakePrefab != null) ReplaceDecoration(0, 0, overBakePrefab);
         // パンケーキこげたときの音再生（Iwama_EffectPlayerの演出）
         AudioManager.PlaySE("burned");
+        Vector3 pos=skilletObj.transform.localPosition;
+        pos.y+=4.37f;
+        EffectManager.PlayEffect("PancakeBurn_Smoke",pos);
 
         yield return new WaitForSeconds(waitSpan);
         DecorationDelete();
@@ -573,7 +577,7 @@ public class system_playerDevice : MonoBehaviour
         Transform marker = skillet.pancake.visualObjs[index].obj.transform;
         GameObject newObj = Instantiate(prefab, marker.position, marker.rotation, marker);
         //こげエフェクト生成
-        EffectManager.PlayEffect("PancakeBurn_Smoke",marker.position);
+        
         
 
         if(typeNum == 1)
