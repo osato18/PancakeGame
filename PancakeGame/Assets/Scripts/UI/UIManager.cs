@@ -106,7 +106,7 @@ public class UIManager : MonoBehaviour
         if (currentBake >= 0.6f)
         {
             float alphaRate=Mathf.Clamp01((currentBakeRate - 0.7f) / 0.3f);
-            byte alpha=(byte)(140*alphaRate);
+            byte alpha=(byte)(200*alphaRate);
             _instance._crisisPanelImg.color=new Color32(255,0,0,alpha);
         }
         else
